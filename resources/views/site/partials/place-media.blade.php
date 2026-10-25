@@ -1,0 +1,1 @@
+<div class="media"><img src="{{ $place->image() }}" alt="{{ $place->get('title') }}" loading="lazy">@if ($place->has('caption'))<span class="media-caption">{{ $place->get('caption') }}</span>@endif</div>
