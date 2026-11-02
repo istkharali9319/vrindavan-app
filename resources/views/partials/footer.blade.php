@@ -14,7 +14,7 @@
         <div class="footer-status"><span class="live">{{ $site->text('footer.status') }}</span><span class="sep"></span><span>Altitude {{ config('resort.altitude') }}</span></div>
       </div>
       <div>
-        <h5>Explore Sanctuary</h5>
+        <h5>Explore Vrindavan</h5>
         <ul>
           <li><a href="{{ route('home') }}">The Retreat Story</a></li>
           <li><a href="{{ route('accommodation') }}">Rooms &amp; Cottages</a></li>

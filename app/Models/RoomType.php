@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['name', 'slug', 'tagline', 'badge', 'description', 'amenities', 'nightly_price', 'max_adults', 'max_children', 'sort_order', 'is_active'])]
+#[Fillable(['name', 'slug', 'tagline', 'badge', 'description', 'amenities', 'nightly_price', 'max_adults', 'max_children', 'sort_order', 'is_active', 'is_coming_soon'])]
 class RoomType extends Model
 {
     /** @use HasFactory<RoomTypeFactory> */
@@ -33,6 +33,7 @@ class RoomType extends Model
             'max_adults' => 'integer',
             'max_children' => 'integer',
             'is_active' => 'boolean',
+            'is_coming_soon' => 'boolean',
             'amenities' => 'array',
             'gallery' => 'array',
         ];
@@ -60,6 +61,14 @@ class RoomType extends Model
     public function scopeActive(Builder $query): void
     {
         $query->where('is_active', true);
+    }
+
+    /**
+     * Shown on the website and open for booking (not "coming soon").
+     */
+    public function isBookable(): bool
+    {
+        return $this->is_active && ! $this->is_coming_soon;
     }
 
     /**

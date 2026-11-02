@@ -1,4 +1,4 @@
-/* Vrindavan Resort — shared interactions */
+/* Vrindavan Resort Sikkim — shared interactions */
 import "./loader";
 import "./stay-dates";
 (function () {
@@ -51,23 +51,6 @@ import "./stay-dates";
     if (next) next.addEventListener("click", () => track.scrollBy({ left: step(), behavior: "smooth" }));
   });
 
-  // Category chips (Experience & Explore) — items carry space-separated data-cat values
-  document.querySelectorAll("[data-filters]").forEach((group) => {
-    const buttons = group.querySelectorAll("[data-filter]");
-    const targets = document.querySelectorAll("main [data-cat]");
-    buttons.forEach((btn) =>
-      btn.addEventListener("click", () => {
-        buttons.forEach((b) => b.classList.toggle("active", b === btn));
-        const f = btn.dataset.filter;
-        targets.forEach((el) => el.classList.toggle("is-hidden", f !== "all" && !el.dataset.cat.split(" ").includes(f)));
-        document.querySelectorAll("[data-filter-group]").forEach((wrap) => {
-          wrap.hidden = !wrap.querySelector("[data-cat]:not(.is-hidden)");
-        });
-        targets.forEach((el) => el.classList.contains("reveal") && el.classList.add("in"));
-      })
-    );
-  });
-
   // Home booking bar — keep the "to" date after the "from" date
   const bar = document.querySelector(".booking-bar");
   if (bar) {
@@ -82,34 +65,21 @@ import "./stay-dates";
     });
   }
 
-  // Gallery filter + lightbox
+  // Gallery lightbox
   const items = Array.from(document.querySelectorAll(".g-item"));
   if (items.length) {
-    document.querySelectorAll(".filter-btn").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        document.querySelectorAll(".filter-btn").forEach((b) => b.classList.remove("active"));
-        btn.classList.add("active");
-        const f = btn.dataset.filter;
-        items.forEach((it) => it.classList.toggle("hide", f !== "all" && it.dataset.cat !== f));
-      });
-    });
-
     const lb = document.querySelector(".lightbox");
     const lbImg = lb.querySelector("img");
-    const lbCap = lb.querySelector(".lb-cap");
     let idx = 0;
-    const visible = () => items.filter((it) => !it.classList.contains("hide"));
     const show = (i) => {
-      const list = visible();
-      idx = (i + list.length) % list.length;
-      const it = list[idx];
-      lbImg.src = it.querySelector("img").src;
-      lbImg.alt = it.querySelector("img").alt;
-      lbCap.textContent = it.querySelector("em").textContent;
+      idx = (i + items.length) % items.length;
+      const img = items[idx].querySelector("img");
+      lbImg.src = img.src;
+      lbImg.alt = img.alt;
     };
-    items.forEach((it) =>
+    items.forEach((it, i) =>
       it.addEventListener("click", () => {
-        show(visible().indexOf(it));
+        show(i);
         lb.classList.add("open");
         body.style.overflow = "hidden";
       })

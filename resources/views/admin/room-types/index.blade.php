@@ -32,7 +32,9 @@
           <div class="type-card-media">
             <img src="{{ $roomType->imageUrl() }}" alt="{{ $roomType->name }}" loading="lazy">
             <span class="type-card-order">#{{ $roomType->sort_order }}</span>
-            @if ($roomType->is_active)
+            @if ($roomType->is_active && $roomType->is_coming_soon)
+              <span class="type-card-status"><i class="ti ti-clock"></i> Coming soon</span>
+            @elseif ($roomType->is_active)
               <span class="type-card-status is-live"><i class="ti ti-world"></i> On website</span>
             @else
               <span class="type-card-status"><i class="ti ti-eye-off"></i> Hidden</span>

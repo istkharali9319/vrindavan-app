@@ -31,7 +31,7 @@ class BookingController extends Controller
      */
     public function create(StayRequest $request, RoomType $roomType): View|RedirectResponse
     {
-        abort_unless($roomType->is_active, Response::HTTP_NOT_FOUND);
+        abort_unless($roomType->isBookable(), Response::HTTP_NOT_FOUND);
 
         $stay = $request->validated();
         $checkIn = CarbonImmutable::parse($stay['check_in']);
@@ -77,7 +77,7 @@ class BookingController extends Controller
 
     public function store(StoreBookingRequest $request, RoomType $roomType, CreateBooking $createBooking, SendBookingConfirmation $sendConfirmation, LinkBookingToAccount $accounts): RedirectResponse
     {
-        abort_unless($roomType->is_active, Response::HTTP_NOT_FOUND);
+        abort_unless($roomType->isBookable(), Response::HTTP_NOT_FOUND);
 
         // A signed-out guest: first find or create their account and sign them in, then book under that account.
         $user = $request->user() ?? $this->accountForGuest($request, $accounts);

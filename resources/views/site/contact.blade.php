@@ -5,12 +5,22 @@
 
 @section('content')
 <main>
-  <section class="map-hero">
-    <iframe title="Map of {{ config('resort.name') }}" src="https://maps.google.com/maps?q={{ rawurlencode($content->text('hero.map_query')) }}&t=&z=10&ie=UTF8&iwloc=&output=embed" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
-    <h1 class="hero-title"><span>{{ $content->html('hero.title') }}</span></h1>
+  <section class="contact-head">
+    <div class="container">
+      <h1 class="display contact-title">{{ $content->html('hero.title') }}</h1>
+      <hr class="rule">
+    </div>
   </section>
 
-  <section class="section">
+  <section class="contact-map">
+    <div class="container">
+      <div class="contact-map-frame reveal">
+        <iframe title="Map of {{ config('resort.name') }}" src="https://maps.google.com/maps?q={{ rawurlencode($content->text('hero.map_query')) }}&t=&z=10&ie=UTF8&iwloc=&output=embed" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+      </div>
+    </div>
+  </section>
+
+  <section class="section contact-body">
     <div class="container contact-grid">
       <form id="contactForm" class="reveal" method="POST" action="{{ route('contact.store') }}" novalidate>
         @csrf

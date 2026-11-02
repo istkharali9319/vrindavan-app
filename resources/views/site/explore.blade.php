@@ -8,7 +8,6 @@
 @section('content')
 @php
     $places = $content->items('places');
-    $categories = app(\App\Support\WebsiteContent::class)->collection('places')['fields']['category']['options'];
 @endphp
 <main>
   <section class="hero-light">
@@ -16,12 +15,6 @@
       <span class="badge-pill">{{ $content->text('hero.badge') }}</span>
       <h1>{{ $content->html('hero.title') }}</h1>
       <p>{{ $content->html('hero.text') }}</p>
-      <div class="chip-row" data-filters role="group" aria-label="Filter journeys">
-        <button type="button" class="active" data-filter="all">All Journeys</button>
-        @foreach ($categories as $value => $label)
-          <button type="button" data-filter="{{ $value }}">{{ $label }}</button>
-        @endforeach
-      </div>
     </div>
   </section>
 
@@ -29,7 +22,7 @@
     <div class="container">
       @foreach ($places as $place)
         @php $isReversed = $loop->even; @endphp
-        <article @class(['journey', 'reveal', 'reverse' => $isReversed]) id="{{ $place->anchor() }}" data-cat="{{ $place->get('category') }}">
+        <article @class(['journey', 'reveal', 'reverse' => $isReversed]) id="{{ $place->anchor() }}">
           @if ($isReversed)
             @include('site.partials.place-media', ['place' => $place])
           @endif

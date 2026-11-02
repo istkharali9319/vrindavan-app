@@ -128,6 +128,14 @@
               <small>Guests can see and book this type.</small>
             </label>
           </div>
+          <div class="form-check form-switch admin-switch mb-4">
+            <input type="hidden" name="is_coming_soon" value="0">
+            <input class="form-check-input" type="checkbox" role="switch" id="is_coming_soon" name="is_coming_soon" value="1" @checked(old('is_coming_soon', $roomType->is_coming_soon))>
+            <label class="form-check-label" for="is_coming_soon">
+              <strong>Coming soon</strong>
+              <small>Shown on the website as "Coming soon". Guests can't book it.</small>
+            </label>
+          </div>
           @if ($roomType->exists)
             <p class="text-muted small mb-3">{{ $roomType->rooms_count }} {{ str('room')->plural($roomType->rooms_count) }} · {{ $roomType->bookings_count }} {{ str('booking')->plural($roomType->bookings_count) }} so far. Tariff changes don't affect existing bookings.</p>
           @endif

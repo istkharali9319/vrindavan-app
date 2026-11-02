@@ -52,7 +52,7 @@ return [
                 'identity' => [
                     'label' => 'Resort',
                     'fields' => [
-                        'name' => ['text', 'Resort name', 'Vrindavan Resort'],
+                        'name' => ['text', 'Resort name', 'Vrindavan Resort Sikkim'],
                         'tagline' => ['text', 'Tagline under the logo', 'Rhenock • East Sikkim'],
                         'altitude' => ['text', 'Altitude', '1,450m'],
                         'brand_style' => ['select', 'Show in the header and footer', 'logo', ['options' => ['logo' => 'Logo image', 'text' => 'Resort name as text']]],
@@ -72,7 +72,7 @@ return [
                 'invoice' => [
                     'label' => 'Invoices',
                     'fields' => [
-                        'legal_name' => ['text', 'Business name on invoices', 'Vrindavan Resort'],
+                        'legal_name' => ['text', 'Business name on invoices', 'Vrindavan Resort Sikkim'],
                         'gstin' => ['text', 'Resort GSTIN (optional)', '', ['help' => 'Printed on every invoice when filled in.']],
                         'note' => ['textarea', 'Note at the bottom of invoices', 'All amounts are in Indian rupees and include GST. Thank you for staying with us.'],
                     ],
@@ -82,7 +82,7 @@ return [
                     'fields' => [
                         'about' => ['textarea', 'About text', 'An intimate Himalayan retreat rooted in Sikkimese warmth, fresh farm cooking, and the restorative silence of the high mountains. Built slowly with local stone and pine.'],
                         'status' => ['text', 'Status badge', 'Open Year-Round'],
-                        'copyright' => ['text', 'Copyright line', 'Vrindavan Luxury Resort Sikkim. All rights reserved.'],
+                        'copyright' => ['text', 'Copyright line', 'Vrindavan Resort Sikkim. All rights reserved.'],
                         'location' => ['text', 'Location line', 'Rhenock · East Sikkim · India'],
                     ],
                 ],
@@ -95,7 +95,7 @@ return [
             'icon' => 'ti-home',
             'route' => 'home',
             'sections' => [
-                'seo' => $seo('Vrindavan Resort · Rhenock, East Sikkim', 'A family-run luxury retreat in Rhenock, East Sikkim — intimate rooms, a garden-grown kitchen, and Kanchenjunga unfolding beyond your window.'),
+                'seo' => $seo('Vrindavan Resort Sikkim · Rhenock, East Sikkim', 'A family-run luxury retreat in Rhenock, East Sikkim — intimate rooms, a garden-grown kitchen, and Kanchenjunga unfolding beyond your window.'),
                 'hero' => [
                     'label' => 'Hero',
                     'fields' => [
@@ -147,7 +147,7 @@ return [
                         'title' => ['textarea', 'Heading', 'Reviews from our Guests'],
                         'rating' => ['text', 'Average rating', '4.5'],
                         'count' => ['text', 'Number of reviews', '3,987'],
-                        'lead' => ['textarea', 'Text beside the reviews', 'What our Guests think about us.'],
+                        'lead' => ['textarea', 'Text beside the reviews', 'Guest Experiences'],
                     ],
                 ],
                 'cta' => $cta('cta-lupine-valley.jpg'),
@@ -160,7 +160,7 @@ return [
             'icon' => 'ti-bed',
             'route' => 'accommodation',
             'sections' => [
-                'seo' => $seo('Rooms & Suites · Vrindavan Resort', 'Family cottages, Kanchenjunga-facing rooms and forest views in Rhenock, East Sikkim — built from local pine and stone.'),
+                'seo' => $seo('Rooms & Suites · Vrindavan Resort Sikkim', 'Family cottages, Kanchenjunga-facing rooms and forest views in Rhenock, East Sikkim — built from local pine and stone.'),
                 'hero' => [
                     'label' => 'Hero',
                     'fields' => [
@@ -201,7 +201,7 @@ return [
             'icon' => 'ti-flame',
             'route' => 'experience',
             'sections' => [
-                'seo' => $seo('Experiences · Vrindavan Resort', 'Bonfires and Lepcha folk songs, momo masterclasses, Reshi Khola angling, village walks, Temi tea and stargazing — days shaped by the mountain rhythm.'),
+                'seo' => $seo('Experiences · Vrindavan Resort Sikkim', 'Bonfires and Lepcha folk songs, momo masterclasses, Reshi Khola angling, village walks, Temi tea and stargazing — days shaped by the mountain rhythm.'),
                 'hero' => [
                     'label' => 'Hero',
                     'fields' => [
@@ -244,7 +244,7 @@ return [
             'icon' => 'ti-tools-kitchen-2',
             'route' => 'dining',
             'sections' => [
-                'seo' => $seo('Dining · Vrindavan Resort', 'Garden-to-table Sikkimese and Pahadi cooking at Vrindavan Resort — momos, thalis and long-table dinners on the deck.'),
+                'seo' => $seo('Dining · Vrindavan Resort Sikkim', 'Garden-to-table Sikkimese and Pahadi cooking at Vrindavan Resort Sikkim — momos, thalis and long-table dinners on the deck.'),
                 'hero' => [
                     'label' => 'Hero',
                     'fields' => [
@@ -285,7 +285,7 @@ return [
             'icon' => 'ti-photo',
             'route' => 'gallery',
             'sections' => [
-                'seo' => $seo('Gallery · Vrindavan Resort', 'Photographs from Vrindavan Resort and the Rhenock valley — the resort, the rooms, the food, the culture and the mountains.'),
+                'seo' => $seo('Gallery · Vrindavan Resort Sikkim', 'Photographs from Vrindavan Resort Sikkim and the Rhenock valley — the resort, the rooms, the food, the culture and the mountains.'),
                 'hero' => [
                     'label' => 'Hero',
                     'fields' => [
@@ -303,7 +303,7 @@ return [
             'icon' => 'ti-map-2',
             'route' => 'explore',
             'sections' => [
-                'seo' => $seo('Explore Nearby · Vrindavan Resort', 'Lampokhari lake, Mankhim ridge, the Old Silk Route at Zuluk, Reshi Khola, Temi tea estate and Rhenock Gompa — all within easy reach of Vrindavan.'),
+                'seo' => $seo('Explore Nearby · Vrindavan Resort Sikkim', 'Lampokhari lake, Mankhim ridge, the Old Silk Route at Zuluk, Reshi Khola, Temi tea estate and Rhenock Gompa — all within easy reach of Vrindavan.'),
                 'hero' => [
                     'label' => 'Hero',
                     'fields' => [
@@ -332,7 +332,7 @@ return [
                     'fields' => [
                         'title' => ['text', 'Heading', 'Custom Day-Trek or Silk Route Itinerary?'],
                         'text' => ['textarea', 'Text', 'Our resident naturalist curates bespoke walks customized to your fitness and photographic rhythm.'],
-                        'button' => ['text', 'Button label', 'Inquire with concierge'],
+                        'button' => ['text', 'Button label', 'Enquire with concierge'],
                     ],
                 ],
                 'cta' => $cta('cta-mountain-terrace.jpg', 'Begin your high mountain chapter', 'Reserve your cottage or suite directly with us for guaranteed seasonal tariffs, complimentary high-altitude tea tastings, and flexible Silk Route permits.'),
@@ -380,7 +380,7 @@ return [
             'icon' => 'ti-mail',
             'route' => 'contact',
             'sections' => [
-                'seo' => $seo('Contact Us · Vrindavan Resort', 'Contact Vrindavan Resort, Reshi Khola Road, Rhenock, East Sikkim 737133. Directions by air, rail and road.'),
+                'seo' => $seo('Contact Us · Vrindavan Resort Sikkim', 'Contact Vrindavan Resort Sikkim, Reshi Khola Road, Rhenock, East Sikkim 737133. Directions by air, rail and road.'),
                 'hero' => [
                     'label' => 'Hero',
                     'fields' => [

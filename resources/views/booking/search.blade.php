@@ -59,9 +59,11 @@
           <p class="room-option-meta">{{ $roomType->capacitySummary() }} · Children under {{ config('booking.child_free_below_age') }} stay free</p>
         </div>
         <div class="room-option-price">
-          <div class="price-block"><small>Per night</small><strong>{{ $roomType->formattedPrice() }}</strong><em>(With GST)</em></div>
+          <div class="price-block"><small>Per night</small><strong>{{ $roomType->formattedPrice() }}</strong><em>(Including GST)</em></div>
 
-          @if ($stay)
+          @if ($roomType->is_coming_soon)
+            <span class="badge-soft warn">Coming soon</span>
+          @elseif ($stay)
             @if ($roomType->free_rooms === 0)
               <span class="badge-soft warn">Fully booked</span>
             @elseif (! $fitsGuests)

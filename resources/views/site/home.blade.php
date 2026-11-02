@@ -18,8 +18,8 @@
       </div>
 
       <form class="booking-bar" action="{{ route('booking.search') }}" method="get" aria-label="Check availability">
-        <label><span>From</span><input type="date" name="check_in" min="{{ \App\Http\Requests\Booking\StayRequest::earliestCheckIn()->toDateString() }}" max="{{ \App\Http\Requests\Booking\StayRequest::latestCheckIn()->toDateString() }}" required></label>
-        <label><span>To</span><input type="date" name="check_out" min="{{ \App\Http\Requests\Booking\StayRequest::earliestCheckIn()->addDay()->toDateString() }}" required></label>
+        <label><span>Check-in</span><input type="date" name="check_in" min="{{ \App\Http\Requests\Booking\StayRequest::earliestCheckIn()->toDateString() }}" max="{{ \App\Http\Requests\Booking\StayRequest::latestCheckIn()->toDateString() }}" required></label>
+        <label><span>Check-out</span><input type="date" name="check_out" min="{{ \App\Http\Requests\Booking\StayRequest::earliestCheckIn()->addDay()->toDateString() }}" required></label>
         <label><span>Adults</span><input type="number" name="adults" min="1" max="12" value="2"></label>
         <label><span>Children</span><input type="number" name="children" min="0" max="8" value="0"></label>
         <button type="submit" class="btn">Book Now</button>
@@ -75,7 +75,9 @@
         @foreach ($featuredRoomTypes as $roomType)
           <a href="{{ route('accommodation') }}#{{ $roomType->slug }}" class="card room-card reveal">
             <div class="media">
-              @if ($roomType->badge)
+              @if ($roomType->is_coming_soon)
+                <span class="media-badge is-soon right">Coming soon</span>
+              @elseif ($roomType->badge)
                 <span class="media-badge light right">{{ $roomType->badge }}</span>
               @endif
               <img src="{{ $roomType->imageUrl() }}" alt="{{ $roomType->name }} at {{ config('resort.name') }}" loading="lazy">

@@ -26,6 +26,7 @@ class RoomTypeRequest extends FormRequest
         $this->merge([
             'slug' => Str::slug((string) ($this->input('slug') ?: $this->input('name'))),
             'is_active' => $this->boolean('is_active'),
+            'is_coming_soon' => $this->boolean('is_coming_soon'),
             'amenities' => collect(preg_split('/\R/', (string) $this->input('amenities')))
                 ->map(fn (string $line): string => trim($line))
                 ->filter()
@@ -55,6 +56,7 @@ class RoomTypeRequest extends FormRequest
             'max_children' => ['required', 'integer', 'min:0', 'max:8'],
             'sort_order' => ['nullable', 'integer', 'min:0', 'max:999'],
             'is_active' => ['boolean'],
+            'is_coming_soon' => ['boolean'],
             'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
             'gallery' => ['array', 'max:'.self::MAX_GALLERY_PHOTOS],
             'gallery.*' => ['image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
@@ -85,7 +87,7 @@ class RoomTypeRequest extends FormRequest
     public function roomTypeAttributes(): array
     {
         return [
-            ...$this->safe()->only(['name', 'slug', 'tagline', 'badge', 'description', 'amenities', 'max_adults', 'max_children', 'is_active']),
+            ...$this->safe()->only(['name', 'slug', 'tagline', 'badge', 'description', 'amenities', 'max_adults', 'max_children', 'is_active', 'is_coming_soon']),
             'sort_order' => (int) ($this->validated('sort_order') ?? 0),
             'nightly_price' => (int) round((float) $this->validated('price') * 100),
         ];

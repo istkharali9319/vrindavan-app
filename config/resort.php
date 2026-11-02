@@ -7,7 +7,7 @@
  */
 return [
 
-    'name' => 'Vrindavan Resort',
+    'name' => 'Vrindavan Resort Sikkim',
 
     'tagline' => 'Rhenock • East Sikkim',
 

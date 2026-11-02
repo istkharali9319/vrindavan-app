@@ -52,7 +52,7 @@
             </div>
             <div class="col-md-6">
               <label class="form-label" for="link_label">Link label</label>
-              <input type="text" id="link_label" name="link_label" value="{{ old('link_label', $experience->link_label) }}" class="form-control" placeholder="Inquire & book">
+              <input type="text" id="link_label" name="link_label" value="{{ old('link_label', $experience->link_label) }}" class="form-control" placeholder="Enquire & Book">
             </div>
             <div class="col-12">
               <span class="form-label d-block">Categories (filters on the Experiences page)</span>

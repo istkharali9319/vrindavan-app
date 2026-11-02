@@ -7,7 +7,6 @@
 @php
     $features = $experiences->where('layout', '!=', 'card')->values();
     $cards = $experiences->where('layout', 'card')->values();
-    $categories = \App\Models\Experience::CATEGORIES;
 @endphp
 <main>
   <section class="hero hero-dark" style="background-image:url('{{ $content->image('hero.image') }}')">
@@ -15,12 +14,6 @@
       <p class="eyebrow">{{ $content->text('hero.eyebrow') }}</p>
       <h1 class="hero-title">{{ $content->html('hero.title') }}</h1>
       <p class="hero-sub">{{ $content->html('hero.subtitle') }}</p>
-      <div class="pill-tabs" data-filters role="group" aria-label="Filter experiences">
-        <button type="button" class="active" data-filter="all">All Experiences</button>
-        @foreach ($categories as $value => $label)
-          <button type="button" data-filter="{{ $value }}">{{ $label }}</button>
-        @endforeach
-      </div>
     </div>
   </section>
 
@@ -38,7 +31,7 @@
   <div class="container" id="experiences">
     @foreach ($features as $experience)
       @php $isReversed = $loop->even; @endphp
-      <article class="exp-row" id="{{ $experience->slug }}" data-cat="{{ implode(' ', $experience->categories ?? []) }}">
+      <article class="exp-row" id="{{ $experience->slug }}">
         <div @class(['split', 'reveal', 'reverse' => $isReversed])>
           <div class="split-media media">
             @if ($experience->badge)
@@ -62,7 +55,7 @@
                 </ul>
               </div>
             @endif
-            <div class="exp-foot"><span>{{ $experience->schedule }}@if ($experience->priceLabel())<b class="exp-price">{{ $experience->priceLabel() }}</b>@endif</span><a href="{{ route('contact') }}" class="link-arrow">{{ $experience->link_label ?: 'Inquire & book' }} <span class="arrow">→</span></a></div>
+            <div class="exp-foot"><span>{{ $experience->schedule }}@if ($experience->priceLabel())<b class="exp-price">{{ $experience->priceLabel() }}</b>@endif</span><a href="{{ route('contact') }}" class="link-arrow">{{ $experience->link_label ?: 'Enquire & Book' }} <span class="arrow">→</span></a></div>
           </div>
         </div>
       </article>
@@ -70,10 +63,10 @@
   </div>
 
   @if ($cards->isNotEmpty())
-    <section class="exp-duo" data-filter-group>
+    <section class="exp-duo">
       <div class="container grid-2">
         @foreach ($cards as $experience)
-          <article class="duo-card reveal" id="{{ $experience->slug }}" data-cat="{{ implode(' ', $experience->categories ?? []) }}">
+          <article class="duo-card reveal" id="{{ $experience->slug }}">
             <div class="media">
               @if ($experience->badge)
                 <span class="media-badge left">{{ $experience->badge }}</span>

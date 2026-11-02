@@ -27,7 +27,9 @@
       <div class="container">
         <div @class(['split', 'reveal', 'reverse' => $isReversed])>
           <div class="split-media media">
-            @if ($roomType->badge)
+            @if ($roomType->is_coming_soon)
+              <span @class(['media-badge', 'is-soon', $isReversed ? 'right' : 'left'])>Coming soon</span>
+            @elseif ($roomType->badge)
               <span @class(['media-badge', $isReversed ? 'right' : 'left'])>{{ $roomType->badge }}</span>
             @endif
             <img src="{{ $roomType->imageUrl() }}" alt="{{ $roomType->name }} at {{ config('resort.name') }}" loading="lazy">
@@ -46,13 +48,17 @@
               </ul>
             @endif
             <div class="stay-foot">
-              <div class="price-block"><small>Starting from</small><strong>{{ $roomType->formattedPrice() }}</strong><em>(With GST)</em></div>
-              <a href="{{ route('booking.search', ['room_type' => $roomType->slug]) }}" class="btn btn-forest">Reserve {{ $roomType->name }} <span class="arrow">→</span></a>
+              <div class="price-block"><small>Starting from</small><strong>{{ $roomType->formattedPrice() }}</strong><em>(Including GST)</em></div>
+              @if ($roomType->is_coming_soon)
+                <span class="btn btn-forest is-disabled" aria-disabled="true">Coming soon</span>
+              @else
+                <a href="{{ route('booking.search', ['room_type' => $roomType->slug]) }}" class="btn btn-forest">Reserve {{ $roomType->name }} <span class="arrow">→</span></a>
+              @endif
             </div>
           </div>
         </div>
         @if ($roomType->galleryUrls())
-          <div class="thumbs-head reveal"><h3>{{ $content->text('intro.gallery_title') }}</h3><span>{{ count($roomType->galleryUrls()) }} {{ str('perspective')->plural(count($roomType->galleryUrls())) }}</span></div>
+          <div class="thumbs-head reveal"><h3>{{ $content->text('intro.gallery_title') }}</h3><span>Room Gallery</span></div>
           <div class="thumbs reveal">
             @foreach ($roomType->galleryUrls() as $photo)
               <div class="media"><img src="{{ $photo }}" alt="{{ $roomType->name }}, photo {{ $loop->iteration }}" loading="lazy"></div>
