@@ -3,6 +3,7 @@
 namespace App\Actions\Fortify;
 
 use App\Models\User;
+use App\Rules\UniquePhone;
 use App\Support\PhoneNumber;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Support\Facades\Validator;
@@ -34,9 +35,10 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
                 Rule::unique('users')->ignore($user->id),
             ],
 
-            'phone' => ['required', 'string', 'regex:/^\+[1-9]\d{7,14}$/'],
+            'phone' => ['required', 'string', 'regex:/^\+[1-9]\d{7,14}$/', UniquePhone::except($user->id)],
         ], [
             'phone.regex' => 'Please enter a valid mobile number, e.g. 94320 64521 or +44 20 7946 0958.',
+            'phone.unique' => UniquePhone::MESSAGE,
         ])->validateWithBag('updateProfileInformation');
 
         if ($input['email'] !== $user->email &&

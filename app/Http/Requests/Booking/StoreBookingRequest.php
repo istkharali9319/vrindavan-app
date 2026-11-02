@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Booking;
 
 use App\Enums\PaymentMethod;
+use App\Rules\UniquePhone;
 use App\Support\PhoneNumber;
 use App\Support\Razorpay;
 use Illuminate\Contracts\Validation\ValidationRule;
@@ -18,6 +19,8 @@ class StoreBookingRequest extends StayRequest
      * @var list<string>
      */
     public const TITLES = ['Mr', 'Ms', 'Mrs', 'Dr', 'Mx'];
+
+    public const PHONE_TAKEN = 'This mobile number is already registered with another account. Please sign in to book with it, or use a different number.';
 
     /**
      * Calling codes offered next to the mobile number (any other number can be typed with its own "+").
@@ -61,7 +64,11 @@ class StoreBookingRequest extends StayRequest
             'contact_email' => ['required', 'email', 'max:191'],
             'country_code' => ['required', Rule::in(array_keys(self::COUNTRY_CODES))],
             'mobile' => ['required', 'string', 'max:20'],
-            'contact_phone' => ['required', 'string', 'regex:/^\+[1-9]\d{7,14}$/'],
+            'contact_phone' => [
+                'required', 'string', 'regex:/^\+[1-9]\d{7,14}$/',
+                // A signed-out guest gets an account with this number, so it can't be someone else's.
+                ...($this->user() ? [] : [UniquePhone::exceptEmail((string) $this->input('contact_email'))]),
+            ],
             'gst_number' => ['nullable', 'string', 'regex:/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/'],
             'special_requests' => ['nullable', 'string', 'max:500'],
             'terms' => ['accepted'],
@@ -80,6 +87,7 @@ class StoreBookingRequest extends StayRequest
             ...parent::messages(),
             'contact_phone.regex' => 'Please enter a valid mobile number.',
             'contact_phone.required' => 'Please enter your mobile number.',
+            'contact_phone.unique' => self::PHONE_TAKEN,
             'gst_number.regex' => 'Please enter a valid 15-character GSTIN, e.g. 11AAAAA1111A1Z5.',
             'payment_method.required' => 'Please choose how you would like to pay.',
             'payment_method.in' => 'Please choose how you would like to pay.',

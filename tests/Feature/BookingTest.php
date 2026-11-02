@@ -316,7 +316,7 @@ class BookingTest extends TestCase
             ->assertSessionHasNoErrors();
         auth()->logout();
 
-        $this->post(route('booking.store', 'standard-room'), $this->bookingForm(['contact_email' => 'second@example.com']))
+        $this->post(route('booking.store', 'standard-room'), $this->bookingForm(['contact_email' => 'second@example.com', 'mobile' => '98300 22222']))
             ->assertRedirect()
             ->assertSessionHasErrors(['check_in' => 'Sorry, the last Standard Room for these dates has just been booked. Please try other dates or another room.']);
 

@@ -4,6 +4,7 @@ namespace App\Actions\Fortify;
 
 use App\Enums\Role;
 use App\Models\User;
+use App\Rules\UniquePhone;
 use App\Support\PhoneNumber;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -44,10 +45,11 @@ class CreateNewUser implements CreatesNewUsers
                 'max:191',
                 Rule::unique(User::class),
             ],
-            'phone' => ['required', 'string', 'regex:/^\+[1-9]\d{7,14}$/'],
+            'phone' => ['required', 'string', 'regex:/^\+[1-9]\d{7,14}$/', UniquePhone::except()],
             'password' => $this->passwordRules(),
         ], [
             'phone.regex' => 'Please enter a valid mobile number, e.g. 94320 64521 or +44 20 7946 0958.',
+            'phone.unique' => UniquePhone::MESSAGE,
         ])->validate();
 
         return DB::transaction(function () use ($input): User {

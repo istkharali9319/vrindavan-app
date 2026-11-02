@@ -606,3 +606,6 @@
 .setup-banner strong { color: var(--ink); font-size: 15.5px; }
 .setup-banner span { color: var(--muted); font-size: 14px; line-height: 1.55; }
 .setup-banner form { margin: 0; }
+.form-alert { display: grid; gap: 4px; margin: 0 0 26px; padding: 14px 18px; border: 1px solid #efc9c1; border-left: 4px solid #b4442f; border-radius: 12px; background: #fdf1ee; color: #6e2a1f; font-size: 14.5px; line-height: 1.55; }
+.form-alert strong { color: #8a2f22; font-size: 15px; }
+.form-alert a { color: #8a2f22; font-weight: 700; text-decoration: underline; }

@@ -21,7 +21,7 @@
   <div class="container booking-flow-body">
     <p class="back-link"><a href="{{ route('booking.search', $stay) }}" class="text-link">← Change room or dates</a></p>
 
-    @include('booking.partials.errors')
+    @include('booking.partials.errors', ['except' => [StoreBookingRequest::PHONE_TAKEN]])
 
     <div class="booking-grid">
       <section class="guest-panel">
@@ -30,6 +30,12 @@
 
         <form method="POST" action="{{ route('booking.store', $roomType) }}" class="guest-form" novalidate>
           @csrf
+          @if ($errors->first('contact_phone') === StoreBookingRequest::PHONE_TAKEN)
+            <div class="form-alert" role="alert">
+              <strong>This mobile number is already registered</strong>
+              <span>It belongs to another account. <a href="{{ route('login', ['return' => \App\Support\ReturnTo::currentPath(request())]) }}">Sign in</a> to book with it, or use a different number below.</span>
+            </div>
+          @endif
           @foreach (['check_in', 'check_out', 'adults', 'children'] as $field)
             <input type="hidden" name="{{ $field }}" value="{{ $stay[$field] }}">
           @endforeach
@@ -73,7 +79,9 @@
                 </select>
                 <input id="mobile" name="mobile" type="tel" value="{{ old('mobile', $mobile) }}" autocomplete="tel-national" inputmode="tel" maxlength="20" required>
               </div>
-              @error('contact_phone')<small class="field-error">{{ $message }}</small>@enderror
+              @error('contact_phone')
+                @unless ($message === StoreBookingRequest::PHONE_TAKEN)<small class="field-error">{{ $message }}</small>@endunless
+              @enderror
               @error('mobile')<small class="field-error">{{ $message }}</small>@enderror
             </div>
           </div>
