@@ -24,7 +24,7 @@
       <dt>Check-in</dt><dd>{{ $booking->check_in->format('l, j F Y') }}, from {{ \Carbon\Carbon::parse(config('booking.check_in_time'))->format('g:i A') }}</dd>
       <dt>Check-out</dt><dd>{{ $booking->check_out->format('l, j F Y') }}, by {{ \Carbon\Carbon::parse(config('booking.check_out_time'))->format('g:i A') }}</dd>
       <dt>Nights</dt><dd>{{ $booking->nights }}</dd>
-      <dt>Room</dt><dd>{{ $booking->roomType->name }}, room {{ $booking->room->number }}</dd>
+      <dt>Room</dt><dd>{{ $booking->roomType->name }}, {{ lcfirst($booking->roomNumbersLabel()) }}</dd>
       <dt>Guests</dt><dd>{{ $booking->guestSummary() }}</dd>
       @if ($booking->special_requests)
         <dt>Requests</dt><dd>{{ $booking->special_requests }}</dd>
@@ -35,7 +35,7 @@
   <section class="panel">
     <h2>Payment</h2>
     <dl class="detail-list">
-      <dt>Tariff</dt><dd>{{ $booking->formattedNightlyPrice() }} × {{ $booking->nights }} {{ str('night')->plural($booking->nights) }}</dd>
+      <dt>Tariff</dt><dd>{{ $booking->formattedNightlyPrice() }}@if ($booking->rooms_count > 1) × {{ $booking->roomsCountLabel() }}@endif × {{ $booking->nights }} {{ str('night')->plural($booking->nights) }}</dd>
       @foreach ($booking->addOns as $addOn)
         <dt>{{ $loop->first ? 'Add-ons' : '' }}</dt><dd>{{ $addOn->name }} · {{ $addOn->amount === 0 ? 'Free' : $addOn->formattedAmount() }}</dd>
       @endforeach

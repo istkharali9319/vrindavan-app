@@ -36,7 +36,7 @@ class BookingController extends Controller
         $today = now(config('booking.timezone'))->toDateString();
 
         $bookings = Booking::query()
-            ->with(['roomType', 'room'])
+            ->with(['roomType', 'room', 'rooms'])
             ->when(trim($filters['search'] ?? '') !== '', function ($query) use ($filters) {
                 // "!" escapes the LIKE wildcards; it behaves the same on MySQL and SQLite.
                 $like = '%'.str_replace(['!', '%', '_'], ['!!', '!%', '!_'], trim($filters['search'])).'%';
@@ -67,7 +67,7 @@ class BookingController extends Controller
     public function show(Booking $booking): View
     {
         return view('admin.bookings.show', [
-            'booking' => $booking->load(['roomType', 'room', 'user', 'addOns', 'payments']),
+            'booking' => $booking->load(['roomType', 'room', 'rooms', 'user', 'addOns', 'payments']),
             'cancelledBy' => $booking->cancelled_by ? User::withTrashed()->find($booking->cancelled_by) : null,
         ]);
     }

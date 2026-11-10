@@ -179,7 +179,7 @@ class BookingTest extends TestCase
         $this->actingAs($customer)->get($response->headers->get('Location'))
             ->assertOk()
             ->assertSee('value="Priya"', false)
-            ->assertSee('Room 1 : 2 Adults, 1 Child')
+            ->assertSee('1 Room · 2 Adults, 1 Child')
             ->assertSee('Tue, 10 Nov 2026');
     }
 
@@ -227,7 +227,7 @@ class BookingTest extends TestCase
             ->get(route('booking.create', ['family-cottage', ...$this->stay()]))
             ->assertOk()
             ->assertSee('Separate Family Cottage')
-            ->assertSee('₹3,900 × 3 nights', false)
+            ->assertSeeText('₹3,900 × 3 nights')
             ->assertSee('₹11,700')
             ->assertSee('value="Priya"', false)
             ->assertSee('value="Malhotra"', false);
@@ -359,7 +359,7 @@ class BookingTest extends TestCase
         $customer = User::factory()->customer()->create();
 
         $this->actingAs($customer)
-            ->post(route('booking.store', 'standard-room'), $this->bookingForm(['adults' => 4, 'mobile' => '12', 'first_name' => '']))
+            ->post(route('booking.store', 'standard-room'), $this->bookingForm(['adults' => 13, 'mobile' => '12', 'first_name' => '']))
             ->assertSessionHasErrors(['adults', 'contact_phone', 'first_name']);
 
         $this->post(route('booking.store', 'standard-room'), $this->bookingForm(['terms' => null, 'title' => 'Sir', 'gst_number' => 'NOT-A-GSTIN']))

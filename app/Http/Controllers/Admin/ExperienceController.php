@@ -8,6 +8,7 @@ use App\Http\Requests\Admin\ExperienceRequest;
 use App\Models\BookingAddOn;
 use App\Models\Experience;
 use App\Support\ContentFieldRules;
+use App\Support\ImageUpload;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
@@ -98,6 +99,6 @@ class ExperienceController extends Controller
             Storage::disk('public')->delete($experience->image_path);
         }
 
-        $experience->forceFill(['image_path' => $request->file('image')->store('experiences', 'public')])->save();
+        $experience->forceFill(['image_path' => ImageUpload::photo($request->file('image'), 'experiences')])->save();
     }
 }

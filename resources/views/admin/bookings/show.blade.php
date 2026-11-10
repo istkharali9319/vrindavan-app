@@ -35,7 +35,7 @@
     <div>
       <p class="booking-hero-eyebrow">Booking reference</p>
       <h2>{{ $booking->reference }}</h2>
-      <p class="booking-hero-room">Room {{ $booking->room->number }} · {{ $booking->roomType->name }}</p>
+      <p class="booking-hero-room">{{ $booking->roomNumbersLabel() }} · {{ $booking->roomType->name }}</p>
     </div>
     <div class="booking-hero-badges">
       <span class="booking-chip {{ $stay['tone'] }}"><i class="ti {{ $stay['icon'] }}"></i> {{ $stay['label'] }}</span>
@@ -66,7 +66,7 @@
       <div class="card-header"><h5 class="mb-0">Stay details</h5></div>
       <div class="card-body">
         <div class="booking-facts">
-          <div><i class="ti ti-key"></i><span>Room</span><strong>{{ $booking->room->number }}</strong></div>
+          <div><i class="ti ti-key"></i><span>{{ str('Room')->plural($booking->rooms_count) }}</span><strong>{{ $booking->roomNumbers() }}</strong></div>
           <div><i class="ti ti-bed"></i><span>Room type</span><strong>{{ $booking->roomType->name }}</strong></div>
           <div><i class="ti ti-users"></i><span>Guests</span><strong>{{ $booking->guestSummary() }}</strong></div>
           <div><i class="ti ti-moon"></i><span>Nights</span><strong>{{ $booking->nights }}</strong></div>
@@ -86,7 +86,7 @@
       <div class="card-body">
         <div class="booking-charges">
           <div class="booking-charge-row">
-            <span>{{ $booking->roomType->name }} · {{ $booking->formattedNightlyPrice() }} × {{ $booking->nights }} {{ str('night')->plural($booking->nights) }}</span>
+            <span>{{ $booking->roomType->name }} · {{ $booking->formattedNightlyPrice() }}@if ($booking->rooms_count > 1) × {{ $booking->roomsCountLabel() }}@endif × {{ $booking->nights }} {{ str('night')->plural($booking->nights) }}</span>
             <span>{{ \App\Support\Money::format($booking->room_amount) }}</span>
           </div>
           @foreach ($booking->addOns as $addOn)
@@ -219,7 +219,7 @@
         <div class="card booking-danger">
           <div class="card-body">
             <h6><i class="ti ti-alert-triangle"></i> Cancel booking</h6>
-            <p>Releases room {{ $booking->room->number }} for these nights straight away. This can't be undone.</p>
+            <p>Releases {{ lcfirst($booking->roomNumbersLabel()) }} for these nights straight away. This can't be undone.</p>
             <form method="POST" action="{{ route('admin.bookings.cancel', $booking) }}"
                   onsubmit="return confirm('Cancel booking {{ $booking->reference }}?')">
               @csrf

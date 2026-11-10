@@ -162,7 +162,7 @@
               </span>
               <span class="arrival-body">
                 <strong>{{ $booking->contact_name }}</strong>
-                <span>Room {{ $booking->room->number }} · {{ $booking->roomType->name }} · {{ $booking->nights }} {{ str('night')->plural($booking->nights) }}</span>
+                <span>{{ $booking->roomNumbersLabel() }} · {{ $booking->roomType->name }} · {{ $booking->nights }} {{ str('night')->plural($booking->nights) }}</span>
               </span>
               <span class="arrival-side">
                 {{ $booking->formattedTotal() }}

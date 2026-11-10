@@ -37,9 +37,14 @@ class BookingController extends Controller
         $checkIn = CarbonImmutable::parse($stay['check_in']);
         $checkOut = CarbonImmutable::parse($stay['check_out']);
 
-        if (! $roomType->roomsFreeBetween($checkIn, $checkOut)->exists()) {
+        $roomsCount = (int) $roomType->roomsToBook((int) $stay['adults'], (int) ($stay['children'] ?? 0), isset($stay['rooms']) ? (int) $stay['rooms'] : null);
+        $freeRooms = $roomType->roomsFreeBetween($checkIn, $checkOut)->count();
+
+        if ($freeRooms < $roomsCount) {
             return redirect()->route('booking.search', $stay)
-                ->withErrors(['check_in' => "Sorry, the {$roomType->name} is fully booked for these dates."]);
+                ->withErrors(['check_in' => $freeRooms === 0
+                    ? "Sorry, the {$roomType->name} is fully booked for these dates."
+                    : "Sorry, only {$freeRooms} {$roomType->name} ".str('room')->plural($freeRooms)." left for these dates, and your group needs {$roomsCount}."]);
         }
 
         $nights = (int) $checkIn->diffInDays($checkOut);
@@ -47,11 +52,12 @@ class BookingController extends Controller
         return view('booking.create', [
             'roomType' => $roomType,
             'user' => $request->user(),
-            'stay' => [...$stay, 'children' => (int) ($stay['children'] ?? 0)],
+            'stay' => [...$stay, 'children' => (int) ($stay['children'] ?? 0), 'rooms' => $roomsCount],
+            'roomsCount' => $roomsCount,
             'checkIn' => $checkIn,
             'checkOut' => $checkOut,
             'nights' => $nights,
-            'total' => $roomType->nightly_price * $nights,
+            'total' => $roomType->nightly_price * $nights * $roomsCount,
             'addOns' => $this->chosenAddOns($request),
             'paymentMethods' => StoreBookingRequest::paymentMethods(),
             'guests' => (int) $stay['adults'] + (int) ($stay['children'] ?? 0),
@@ -97,7 +103,7 @@ class BookingController extends Controller
                 return back()->withInput()->withErrors($exception->errors());
             }
 
-            return redirect()->route('booking.search', collect($request->validated())->only(['check_in', 'check_out', 'adults', 'children'])->all())
+            return redirect()->route('booking.search', collect($request->validated())->only(['check_in', 'check_out', 'adults', 'children', 'rooms'])->filter(fn ($value) => $value !== null)->all())
                 ->withErrors($exception->errors());
         }
 
@@ -120,7 +126,7 @@ class BookingController extends Controller
         }
 
         return view('booking.confirmation', [
-            'booking' => $booking->load(['roomType', 'room', 'addOns']),
+            'booking' => $booking->load(['roomType', 'room', 'rooms', 'addOns']),
         ]);
     }
 

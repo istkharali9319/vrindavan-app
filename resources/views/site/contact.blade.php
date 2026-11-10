@@ -5,18 +5,14 @@
 
 @section('content')
 <main>
+  <section class="contact-map" aria-label="Map">
+    <iframe title="Map of {{ config('resort.name') }}" src="https://maps.google.com/maps?q={{ rawurlencode($content->text('hero.map_query')) }}&t=&z=10&ie=UTF8&iwloc=&output=embed" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+  </section>
+
   <section class="contact-head">
     <div class="container">
       <h1 class="display contact-title">{{ $content->html('hero.title') }}</h1>
       <hr class="rule">
-    </div>
-  </section>
-
-  <section class="contact-map">
-    <div class="container">
-      <div class="contact-map-frame reveal">
-        <iframe title="Map of {{ config('resort.name') }}" src="https://maps.google.com/maps?q={{ rawurlencode($content->text('hero.map_query')) }}&t=&z=10&ie=UTF8&iwloc=&output=embed" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
-      </div>
     </div>
   </section>
 

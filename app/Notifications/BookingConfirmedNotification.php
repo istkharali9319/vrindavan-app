@@ -36,7 +36,7 @@ class BookingConfirmedNotification extends Notification implements ShouldQueue
 
     public function toMail(object $notifiable): MailMessage
     {
-        $booking = $this->booking->loadMissing(['roomType', 'room', 'addOns']);
+        $booking = $this->booking->loadMissing(['roomType', 'room', 'rooms', 'addOns']);
         $invoice = BookingInvoice::for($booking);
 
         return (new MailMessage)

@@ -18,11 +18,15 @@
             ['route' => 'admin.experiences.index', 'active' => 'admin.experiences.*', 'icon' => 'ti-flame', 'label' => 'Experiences & add-ons', 'can' => Permission::CatalogManage],
         ],
         'Website' => [
-            ['route' => 'admin.website.index', 'active' => 'admin.website.*', 'icon' => 'ti-world', 'label' => 'Pages & content', 'can' => Permission::ContentManage],
+            ['route' => 'admin.website.index', 'active' => fn () => request()->routeIs('admin.website.*') && request()->route('page') !== 'site', 'icon' => 'ti-world', 'label' => 'Pages & content', 'can' => Permission::ContentManage],
         ],
         'People' => [
             ['route' => 'admin.users.index', 'active' => 'admin.users.*', 'icon' => 'ti-users', 'label' => 'Users & customers', 'can' => Permission::UsersView],
             ['route' => 'admin.staff.index', 'active' => 'admin.staff.*', 'icon' => 'ti-shield-lock', 'label' => 'Staff & roles', 'can' => Permission::RolesManage],
+        ],
+        'System' => [
+            // Site settings: logo, favicon, resort name, contact details, invoices and footer.
+            ['route' => 'admin.website.edit', 'params' => ['page' => 'site'], 'active' => fn () => request()->routeIs('admin.website.*') && request()->route('page') === 'site', 'icon' => 'ti-settings', 'label' => 'Settings', 'can' => Permission::ContentManage],
         ],
     ];
 @endphp
@@ -44,8 +48,8 @@
           @continue(empty($visibleItems))
           <li class="pc-item pc-caption"><label>{{ $group }}</label></li>
           @foreach ($visibleItems as $item)
-            <li @class(['pc-item', 'active' => request()->routeIs($item['active'])])>
-              <a href="{{ route($item['route']) }}" class="pc-link">
+            <li @class(['pc-item', 'active' => is_callable($item['active']) ? $item['active']() : request()->routeIs($item['active'])])>
+              <a href="{{ route($item['route'], $item['params'] ?? []) }}" class="pc-link">
                 <span class="pc-micon"><i class="ti {{ $item['icon'] }}"></i></span>
                 <span class="pc-mtext">{{ $item['label'] }}</span>
                 @if (isset($item['badge']) && ($count = ($item['badge'])()) > 0)

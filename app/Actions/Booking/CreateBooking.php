@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 /**
- * Books one room of the given type, assigning the lowest-numbered free room.
+ * Books the rooms a group needs (see RoomType::roomsToBook()), assigning the lowest-numbered free rooms.
  *
  * The room-type row lock makes competing bookings wait for each other (on MySQL), and the
  * UNIQUE (room_id, night_date) index is the final guarantee against double bookings.
@@ -28,7 +28,7 @@ class CreateBooking
     public function __construct(private ReleaseExpiredHolds $releaseExpiredHolds) {}
 
     /**
-     * @param  array{check_in: string, check_out: string, adults: int|string, children?: int|string|null}  $stay
+     * @param  array{check_in: string, check_out: string, adults: int|string, children?: int|string|null, rooms?: int|string|null}  $stay
      * @param  array{contact_name: string, contact_email: string, contact_phone: string, special_requests?: string|null, guest_title?: string|null, guest_first_name?: string|null, guest_last_name?: string|null, gst_number?: string|null}  $contact
      *
      * A null user is a guest checkout (booked without signing in). $addOnIds are experiences offered as
@@ -37,7 +37,7 @@ class CreateBooking
      *
      * Paying online, the booking waits for payment and holds its room for config('booking.hold_minutes').
      *
-     * @throws ValidationException when no room of this type is free for the dates
+     * @throws ValidationException when not enough rooms of this type are free for the dates
      */
     public function handle(?User $user, RoomType $roomType, array $stay, array $contact, ?string $ipAddress = null, array $addOnIds = [], bool $payOnline = false): Booking
     {
@@ -51,15 +51,21 @@ class CreateBooking
             return DB::transaction(function () use ($user, $roomType, $stay, $contact, $ipAddress, $addOnIds, $payOnline, $checkIn, $checkOut, $nights): Booking {
                 $roomType = RoomType::whereKey($roomType->id)->lockForUpdate()->firstOrFail();
 
-                $room = $roomType->roomsFreeBetween($checkIn, $checkOut)->first();
+                $roomsCount = $roomType->roomsToBook((int) $stay['adults'], (int) ($stay['children'] ?? 0), isset($stay['rooms']) ? (int) $stay['rooms'] : null);
 
-                if ($room === null) {
-                    throw $this->unavailable($roomType);
+                if ($roomsCount === null) {
+                    throw ValidationException::withMessages(['children' => $roomType->occupancyProblem((int) $stay['adults'], (int) ($stay['children'] ?? 0))]);
+                }
+
+                $rooms = $roomType->roomsFreeBetween($checkIn, $checkOut)->limit($roomsCount)->get();
+
+                if ($rooms->count() < $roomsCount) {
+                    throw $this->unavailable($roomType, $roomsCount);
                 }
 
                 $guests = (int) $stay['adults'] + (int) ($stay['children'] ?? 0);
                 $addOns = $this->addOns($addOnIds, $guests, $nights);
-                $roomAmount = $roomType->nightly_price * $nights;
+                $roomAmount = $roomType->nightly_price * $nights * $roomsCount;
 
                 $booking = new Booking([
                     'contact_name' => $contact['contact_name'],
@@ -76,7 +82,8 @@ class CreateBooking
                     'reference' => Booking::generateReference(),
                     'user_id' => $user?->id,
                     'room_type_id' => $roomType->id,
-                    'room_id' => $room->id,
+                    'room_id' => $rooms->first()->id,
+                    'rooms_count' => $roomsCount,
                     'check_in' => $checkIn->toDateString(),
                     'check_out' => $checkOut->toDateString(),
                     'nights' => $nights,
@@ -94,19 +101,20 @@ class CreateBooking
                 ])->save();
 
                 $booking->addOns()->createMany($addOns->all());
+                $booking->rooms()->attach($rooms->modelKeys());
 
                 $now = now();
-                RoomNight::insert(collect(range(0, $nights - 1))->map(fn (int $offset): array => [
+                RoomNight::insert($rooms->flatMap(fn ($room) => collect(range(0, $nights - 1))->map(fn (int $offset): array => [
                     'room_id' => $room->id,
                     'night_date' => $checkIn->addDays($offset)->toDateString(),
                     'booking_id' => $booking->id,
                     'created_at' => $now,
-                ])->all());
+                ]))->all());
 
                 return $booking;
             }, attempts: 3);
         } catch (UniqueConstraintViolationException) {
-            throw $this->unavailable($roomType);
+            throw $this->unavailable($roomType, 1);
         }
     }
 
@@ -144,10 +152,12 @@ class CreateBooking
         })->values();
     }
 
-    protected function unavailable(RoomType $roomType): ValidationException
+    protected function unavailable(RoomType $roomType, int $roomsCount): ValidationException
     {
         return ValidationException::withMessages([
-            'check_in' => "Sorry, the last {$roomType->name} for these dates has just been booked. Please try other dates or another room.",
+            'check_in' => $roomsCount > 1
+                ? "Sorry, there are no longer {$roomsCount} {$roomType->name} rooms free for these dates. Please try other dates or another room."
+                : "Sorry, the last {$roomType->name} for these dates has just been booked. Please try other dates or another room.",
         ]);
     }
 }

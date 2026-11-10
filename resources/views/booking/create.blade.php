@@ -36,7 +36,7 @@
               <span>It belongs to another account. <a href="{{ route('login', ['return' => \App\Support\ReturnTo::currentPath(request())]) }}">Sign in</a> to book with it, or use a different number below.</span>
             </div>
           @endif
-          @foreach (['check_in', 'check_out', 'adults', 'children'] as $field)
+          @foreach (['check_in', 'check_out', 'adults', 'children', 'rooms'] as $field)
             <input type="hidden" name="{{ $field }}" value="{{ $stay[$field] }}">
           @endforeach
 
@@ -160,8 +160,11 @@
           <div class="stay-card-room">
             <img src="{{ $roomType->imageUrl() }}" alt="{{ $roomType->name }}">
             <div>
-              <strong>Room 1 : {{ $stay['adults'] }} {{ str('Adult')->plural((int) $stay['adults']) }}@if ($stay['children']), {{ $stay['children'] }} {{ str('Child')->plural($stay['children']) }}@endif</strong>
+              <strong>{{ $roomsCount }} {{ str('Room')->plural($roomsCount) }} · {{ $stay['adults'] }} {{ str('Adult')->plural((int) $stay['adults']) }}@if ($stay['children']), {{ $stay['children'] }} {{ str('Child')->plural($stay['children']) }}@endif</strong>
               <span>{{ $roomType->name }}</span>
+              @if ($roomsCount > 1)
+                <small class="stay-card-sub">Your group needs {{ $roomsCount }} rooms ({{ $roomType->perRoomSummary() }}).</small>
+              @endif
             </div>
           </div>
           <dl class="stay-card-dates">
@@ -169,10 +172,10 @@
             <div><dt>Check-out</dt><dd>{{ $checkOut->format('D, j M Y') }}<small>by {{ $checkOutTime }}</small></dd></div>
           </dl>
           <div class="stay-card-lines">
-            <div><span>{{ $roomType->formattedPrice() }} × {{ $nights }} {{ str('night')->plural($nights) }}</span><span>{{ Money::format($total) }}</span></div>
+            <div><span><span class="stay-price">{{ $roomType->formattedPrice() }}</span>@if ($roomsCount > 1) × {{ $roomsCount }} rooms @endif × {{ $nights }} {{ str('night')->plural($nights) }}</span><span>{{ Money::format($total) }}</span></div>
             @foreach ($addOns as $addOn)
               @php $addOnAmount = $addOn->price * $addOn->quantityFor($guests, $nights); @endphp
-              <div class="is-addon"><span>+ {{ $addOn->title }}<small class="stay-card-sub">{{ $addOn->priceLabel() }}</small></span><span>{{ $addOnAmount === 0 ? 'Free' : Money::format($addOnAmount) }}</span></div>
+              <div class="is-addon"><span>+ {{ $addOn->title }}<small class="stay-card-sub">@if ($addOn->price)<span class="stay-price">{{ Money::format($addOn->price) }}</span> {{ $addOn->price_unit->label() }}@else{{ $addOn->priceLabel() }}@endif</small></span><span>{{ $addOnAmount === 0 ? 'Free' : Money::format($addOnAmount) }}</span></div>
             @endforeach
             <a class="stay-card-change" href="{{ route('booking.search', [...$stay, 'room_type' => $roomType->slug, 'extras' => 1, 'add_ons' => $addOns->pluck('id')->all()]) }}">{{ $addOns->isEmpty() ? '+ Add experiences & extras' : 'Change extras' }}</a>
             <div class="is-muted"><span>Taxes (GST)</span><span>Included</span></div>

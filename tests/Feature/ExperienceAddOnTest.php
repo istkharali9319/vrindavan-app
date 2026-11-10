@@ -135,8 +135,8 @@ class ExperienceAddOnTest extends TestCase
             ->assertSee('data-addon-modal', false)
             ->assertSee('data-book-room', false)
             ->assertSee('Airport Pickup')
-            ->assertSee('₹1,500 per guest')
-            ->assertSee('₹4,500 for your stay')
+            ->assertSeeText('₹1,500 per guest')
+            ->assertSeeText('₹4,500 for your stay')
             ->assertDontSee('Not An Add-on');
 
         // Continuing carries the chosen extras to the details page; anything not on offer is dropped.

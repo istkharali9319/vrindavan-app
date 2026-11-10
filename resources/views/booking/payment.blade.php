@@ -26,7 +26,7 @@
           <span class="pay-state-icon is-warn" aria-hidden="true"><x-site-icon name="clock" /></span>
           <h2>Your room hold has expired</h2>
           <p class="guest-panel-intro">We held this room for {{ config('booking.hold_minutes') }} minutes while you paid. The time ran out, so the room has been released and no money was taken. You can start a new booking — it only takes a minute.</p>
-          <a href="{{ route('booking.search', ['check_in' => $booking->check_in->toDateString(), 'check_out' => $booking->check_out->toDateString(), 'adults' => $booking->adults, 'children' => $booking->children, 'room_type' => $booking->roomType->slug]) }}" class="btn btn-forest">Book again <span class="arrow">→</span></a>
+          <a href="{{ route('booking.search', ['check_in' => $booking->check_in->toDateString(), 'check_out' => $booking->check_out->toDateString(), 'adults' => $booking->adults, 'children' => $booking->children, 'rooms' => $booking->rooms_count, 'room_type' => $booking->roomType->slug]) }}" class="btn btn-forest">Book again <span class="arrow">→</span></a>
         @else
           <h2>Complete your payment</h2>
           <p class="guest-panel-intro">Booking <strong>{{ $booking->reference }}</strong> is reserved for you. Pay now to confirm it — you'll get your confirmation and invoice by email straight away.</p>
@@ -93,7 +93,7 @@
             <div><dt>Check-out</dt><dd>{{ $booking->check_out->format('D, j M Y') }}</dd></div>
           </dl>
           <div class="stay-card-lines">
-            <div><span>{{ $booking->formattedNightlyPrice() }} × {{ $booking->nights }} {{ str('night')->plural($booking->nights) }}</span><span>{{ Money::format($booking->room_amount) }}</span></div>
+            <div><span>{{ $booking->formattedNightlyPrice() }}@if ($booking->rooms_count > 1) × {{ $booking->roomsCountLabel() }}@endif × {{ $booking->nights }} {{ str('night')->plural($booking->nights) }}</span><span>{{ Money::format($booking->room_amount) }}</span></div>
             @foreach ($booking->addOns as $addOn)
               <div class="is-addon"><span>+ {{ $addOn->name }}</span><span>{{ $addOn->amount === 0 ? 'Free' : $addOn->formattedAmount() }}</span></div>
             @endforeach

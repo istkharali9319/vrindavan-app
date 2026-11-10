@@ -100,6 +100,98 @@ import "./stay-dates";
     });
   }
 
+  // Guests & Rooms picker — rooms follow the group size (e.g. 2 adults + 1 child per room:
+  // 3 adults → 2 rooms, 5 adults → 3 rooms). Guests may add rooms, up to one per adult.
+  document.querySelectorAll("[data-guest-picker]").forEach((picker) => {
+    const toggle = picker.querySelector(".guest-picker-toggle");
+    const panel = picker.querySelector(".guest-picker-panel");
+    const perAdults = Number(picker.dataset.perRoomAdults) || 2;
+    const perChildren = Number(picker.dataset.perRoomChildren) || 0;
+    const input = (field) => picker.querySelector(`input[name="${field}"]`);
+    const state = { adults: Number(input("adults").value), children: Number(input("children").value), rooms: Number(input("rooms").value) };
+    const limits = { adults: [1, 12], children: [0, 8] };
+    const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
+    const roomsNeeded = (adults, children) =>
+      Math.max(1, Math.ceil(adults / perAdults), perChildren > 0 ? Math.ceil(children / perChildren) : 0);
+    // Children need an adult in their room, so cap them by what the adults can take.
+    const maxChildren = () => Math.min(limits.children[1], perChildren * state.adults);
+
+    // Rooms the guest added on top of what the group needs. Only these are sent: otherwise each room
+    // type works out its own count (a roomier cottage needs fewer rooms than the picker's estimate).
+    let extraRooms = Math.max(0, state.rooms - roomsNeeded(state.adults, state.children));
+
+    const render = () => {
+      state.children = Math.min(state.children, maxChildren());
+      const needed = roomsNeeded(state.adults, state.children);
+      state.rooms = Math.min(state.adults, needed + extraRooms);
+      extraRooms = state.rooms - needed;
+      ["adults", "children", "rooms"].forEach((field) => {
+        input(field).value = state[field];
+        picker.querySelector(`[data-count="${field}"]`).textContent = state[field];
+      });
+      input("rooms").disabled = extraRooms === 0;
+      const bounds = { adults: limits.adults, children: [0, maxChildren()], rooms: [needed, state.adults] };
+      picker.querySelectorAll("[data-step]").forEach((button) => {
+        const [min, max] = bounds[button.dataset.step];
+        const value = state[button.dataset.step];
+        button.disabled = Number(button.dataset.delta) < 0 ? value <= min : value >= max;
+      });
+      picker.querySelector("[data-guest-summary]").textContent =
+        plural(state.adults, "Adult", "Adults") +
+        (state.children ? `, ${plural(state.children, "Child", "Children")}` : "") +
+        ` | ${plural(state.rooms, "Room", "Rooms")}`;
+    };
+
+    picker.querySelectorAll("[data-step]").forEach((button) =>
+      button.addEventListener("click", () => {
+        const delta = Number(button.dataset.delta);
+        if (button.dataset.step === "rooms") {
+          extraRooms = Math.max(0, extraRooms + delta);
+        } else {
+          state[button.dataset.step] += delta;
+        }
+        render();
+      })
+    );
+
+    // On the booking page the results must match the picker: closing it with new numbers re-runs the search.
+    const snapshot = () => `${state.adults}/${state.children}/${state.rooms}`;
+    let openedWith = snapshot();
+    const open = (show) => {
+      if (show === !panel.hidden) return;
+      panel.hidden = !show;
+      toggle.setAttribute("aria-expanded", String(show));
+      if (show) {
+        openedWith = snapshot();
+        return;
+      }
+      const form = picker.closest("form");
+      const datesChosen = form && [...form.querySelectorAll('input[name="check_in"], input[name="check_out"]')].every((i) => i.value);
+      if ("autoSubmit" in picker.dataset && snapshot() !== openedWith && datesChosen) {
+        form.requestSubmit();
+      }
+    };
+    toggle.addEventListener("click", () => open(panel.hidden));
+    picker.querySelector(".guest-picker-done").addEventListener("click", () => { open(false); toggle.focus(); });
+    document.addEventListener("click", (e) => { if (!picker.contains(e.target)) open(false); });
+    picker.addEventListener("keydown", (e) => { if (e.key === "Escape") { open(false); toggle.focus(); } });
+
+    render();
+  });
+
+  // Password fields — the eye button shows or hides what was typed
+  document.querySelectorAll("[data-password-toggle]").forEach((button) => {
+    const input = document.getElementById(button.getAttribute("aria-controls"));
+    if (!input) return;
+    button.addEventListener("click", () => {
+      const show = input.type === "password";
+      input.type = show ? "text" : "password";
+      button.setAttribute("aria-pressed", String(show));
+      button.setAttribute("aria-label", show ? "Hide password" : "Show password");
+      input.focus();
+    });
+  });
+
   // Contact form — prefill the message when arriving with stay dates in the link
   const form = document.querySelector("#contactForm");
   if (form) {

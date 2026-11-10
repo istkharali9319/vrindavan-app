@@ -40,7 +40,7 @@ class DashboardController extends Controller
             'rooms' => $rooms,
             'occupancy' => RoomOccupancy::summarise($rooms),
             'roomTypes' => RoomType::query()->withCount('rooms')->orderBy('sort_order')->orderBy('name')->get(),
-            'nextArrivals' => (clone $confirmed)->with(['room', 'roomType'])
+            'nextArrivals' => (clone $confirmed)->with(['room', 'rooms', 'roomType'])
                 ->whereDate('check_in', '>=', $today)
                 ->orderBy('check_in')
                 ->limit(6)

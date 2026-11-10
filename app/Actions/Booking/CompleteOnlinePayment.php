@@ -71,7 +71,7 @@ class CompleteOnlinePayment
     }
 
     /**
-     * Re-reserves the booking's original room for its nights, if nobody else has taken them.
+     * Re-reserves the booking's original rooms for its nights, if nobody else has taken them.
      */
     private function holdRoomAgain(Booking $booking): bool
     {
@@ -82,12 +82,14 @@ class CompleteOnlinePayment
         $now = now();
 
         try {
-            DB::transaction(fn () => RoomNight::insert(collect(range(0, $booking->nights - 1))->map(fn (int $offset): array => [
-                'room_id' => $booking->room_id,
+            $roomIds = $booking->rooms()->pluck('rooms.id')->whenEmpty(fn () => collect([$booking->room_id]));
+
+            DB::transaction(fn () => RoomNight::insert($roomIds->flatMap(fn (int $roomId) => collect(range(0, $booking->nights - 1))->map(fn (int $offset): array => [
+                'room_id' => $roomId,
                 'night_date' => $booking->check_in->addDays($offset)->toDateString(),
                 'booking_id' => $booking->id,
                 'created_at' => $now,
-            ])->all()));
+            ]))->all()));
         } catch (UniqueConstraintViolationException) {
             return false;
         }

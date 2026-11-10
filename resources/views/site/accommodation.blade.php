@@ -49,11 +49,14 @@
             @endif
             <div class="stay-foot">
               <div class="price-block"><small>Starting from</small><strong>{{ $roomType->formattedPrice() }}</strong><em>(Including GST)</em></div>
-              @if ($roomType->is_coming_soon)
-                <span class="btn btn-forest is-disabled" aria-disabled="true">Coming soon</span>
-              @else
-                <a href="{{ route('booking.search', ['room_type' => $roomType->slug]) }}" class="btn btn-forest">Reserve {{ $roomType->name }} <span class="arrow">→</span></a>
-              @endif
+              <div class="stay-actions">
+                <a href="{{ route('accommodation.show', $roomType) }}" class="btn btn-outline">View Details</a>
+                @if ($roomType->is_coming_soon)
+                  <span class="btn btn-forest is-disabled" aria-disabled="true">Coming soon</span>
+                @else
+                  <a href="{{ route('booking.search', ['room_type' => $roomType->slug]) }}" class="btn btn-forest">Reserve {{ $roomType->name }} <span class="arrow">→</span></a>
+                @endif
+              </div>
             </div>
           </div>
         </div>

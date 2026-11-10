@@ -20,8 +20,7 @@
       <form class="booking-bar" action="{{ route('booking.search') }}" method="get" aria-label="Check availability">
         <label><span>Check-in</span><input type="date" name="check_in" min="{{ \App\Http\Requests\Booking\StayRequest::earliestCheckIn()->toDateString() }}" max="{{ \App\Http\Requests\Booking\StayRequest::latestCheckIn()->toDateString() }}" required></label>
         <label><span>Check-out</span><input type="date" name="check_out" min="{{ \App\Http\Requests\Booking\StayRequest::earliestCheckIn()->addDay()->toDateString() }}" required></label>
-        <label><span>Adults</span><input type="number" name="adults" min="1" max="12" value="2"></label>
-        <label><span>Children</span><input type="number" name="children" min="0" max="8" value="0"></label>
+        <x-guest-picker variant="bar" :adults="2" :children="0" />
         <button type="submit" class="btn">Book Now</button>
       </form>
     </section>
@@ -73,7 +72,7 @@
       </div>
       <div class="grid-3">
         @foreach ($featuredRoomTypes as $roomType)
-          <a href="{{ route('accommodation') }}#{{ $roomType->slug }}" class="card room-card reveal">
+          <a href="{{ route('accommodation.show', $roomType) }}" class="card room-card reveal">
             <div class="media">
               @if ($roomType->is_coming_soon)
                 <span class="media-badge is-soon right">Coming soon</span>

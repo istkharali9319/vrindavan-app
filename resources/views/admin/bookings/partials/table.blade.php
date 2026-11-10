@@ -18,7 +18,7 @@
         <tr>
           <td><a href="{{ route('admin.bookings.show', $booking) }}">{{ $booking->reference }}</a></td>
           <td>{{ $booking->contact_name }}<br><small class="text-muted">{{ $booking->contact_phone }}</small></td>
-          <td>{{ $booking->room->number }}<br><small class="text-muted">{{ $booking->roomType->name }}</small></td>
+          <td>{{ $booking->roomNumbers() }}<br><small class="text-muted">{{ $booking->roomType->name }}</small></td>
           <td>{{ $booking->check_in->format('d M Y') }}</td>
           <td>{{ $booking->check_out->format('d M Y') }}</td>
           <td class="text-end">{{ $booking->formattedTotal() }}</td>

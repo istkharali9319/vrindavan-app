@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
@@ -36,6 +37,7 @@ class Booking extends Model
             'check_in' => 'immutable_date',
             'check_out' => 'immutable_date',
             'nights' => 'integer',
+            'rooms_count' => 'integer',
             'adults' => 'integer',
             'children' => 'integer',
             'nightly_price' => 'integer',
@@ -88,6 +90,42 @@ class Booking extends Model
     public function room(): BelongsTo
     {
         return $this->belongsTo(Room::class);
+    }
+
+    /**
+     * Every room in this booking, lowest number first. A group can need more than one room.
+     *
+     * @return BelongsToMany<Room, $this>
+     */
+    public function rooms(): BelongsToMany
+    {
+        return $this->belongsToMany(Room::class)->orderBy('number');
+    }
+
+    /**
+     * "101" or "101, 102".
+     */
+    public function roomNumbers(): string
+    {
+        $numbers = $this->rooms->pluck('number');
+
+        return ($numbers->isEmpty() ? collect([$this->room?->number]) : $numbers)->implode(', ');
+    }
+
+    /**
+     * "Room 101" or "Rooms 101, 102".
+     */
+    public function roomNumbersLabel(): string
+    {
+        return str('Room')->plural(max(1, $this->rooms->count())).' '.$this->roomNumbers();
+    }
+
+    /**
+     * "1 room" or "2 rooms".
+     */
+    public function roomsCountLabel(): string
+    {
+        return $this->rooms_count.' '.str('room')->plural($this->rooms_count);
     }
 
     /**

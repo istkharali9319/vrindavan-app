@@ -2,6 +2,8 @@
     $price = old('price', $roomType->nightly_price ? rtrim(rtrim(number_format($roomType->nightly_price / 100, 2, '.', ''), '0'), '.') : '');
     $amenities = old('amenities', implode("\n", $roomType->amenityList()));
     $amenities = is_array($amenities) ? implode("\n", $amenities) : $amenities;
+    $services = old('services', implode("\n", $roomType->serviceList()));
+    $services = is_array($services) ? implode("\n", $services) : $services;
 @endphp
 <form method="POST" action="{{ $action }}" enctype="multipart/form-data" novalidate>
   @csrf
@@ -49,6 +51,23 @@
               @error('amenities')<div class="invalid-feedback">{{ $message }}</div>@enderror
               @error('amenities.*')<div class="invalid-feedback">{{ $message }}</div>@enderror
             </div>
+            <div class="col-md-6">
+              <label class="form-label" for="bed_type">Bed type <small class="text-muted fw-normal">optional</small></label>
+              <input type="text" id="bed_type" name="bed_type" value="{{ old('bed_type', $roomType->bed_type) }}" maxlength="120" placeholder="One king bed, or two single beds" class="form-control @error('bed_type') is-invalid @enderror">
+              @error('bed_type')<div class="invalid-feedback">{{ $message }}</div>@enderror
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="room_size">Room size <small class="text-muted fw-normal">optional</small></label>
+              <input type="text" id="room_size" name="room_size" value="{{ old('room_size', $roomType->room_size) }}" maxlength="60" placeholder="320 sq ft" class="form-control @error('room_size') is-invalid @enderror">
+              @error('room_size')<div class="invalid-feedback">{{ $message }}</div>@enderror
+            </div>
+            <div class="col-12">
+              <label class="form-label" for="services">Features &amp; services <small class="text-muted fw-normal">one per line, shown on the room's details page</small></label>
+              <textarea id="services" name="services" rows="4" class="form-control @error('services') is-invalid @enderror @error('services.*') is-invalid @enderror" placeholder="Daily housekeeping&#10;Room service 7 AM – 10 PM&#10;Free Wi-Fi">{{ $services }}</textarea>
+              @error('services')<div class="invalid-feedback">{{ $message }}</div>@enderror
+              @error('services.*')<div class="invalid-feedback">{{ $message }}</div>@enderror
+              <div class="form-text">Empty fields are not shown on the website.</div>
+            </div>
           </div>
         </div>
       </div>
@@ -64,7 +83,7 @@
                 <span class="photo-drop-hint"><i class="ti ti-upload"></i> {{ $roomType->image_path ? 'Replace photo' : 'Upload photo' }}</span>
               </label>
               <input type="file" id="image" name="image" accept="image/jpeg,image/png,image/webp" class="visually-hidden" data-image-input>
-              <small class="text-muted d-block mt-2">JPG, PNG or WebP up to 5 MB. Landscape works best.</small>
+              <small class="text-muted d-block mt-2">JPG, PNG or WebP up to 5 MB. Photos are cropped to 4:3, resized and saved as a smaller WebP automatically, with no visible loss of quality.</small>
               @error('image')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
             </div>
             <div class="col-md-7">
@@ -104,14 +123,17 @@
           </div>
           <div class="row g-3 mb-3">
             <div class="col-6">
-              <label class="form-label" for="max_adults">Max adults</label>
+              <label class="form-label" for="max_adults">Max adults per room</label>
               <input type="number" id="max_adults" name="max_adults" value="{{ old('max_adults', $roomType->max_adults) }}" min="1" max="12" class="form-control @error('max_adults') is-invalid @enderror" required>
               @error('max_adults')<div class="invalid-feedback">{{ $message }}</div>@enderror
             </div>
             <div class="col-6">
-              <label class="form-label" for="max_children">Max children</label>
+              <label class="form-label" for="max_children">Max children per room</label>
               <input type="number" id="max_children" name="max_children" value="{{ old('max_children', $roomType->max_children) }}" min="0" max="8" class="form-control @error('max_children') is-invalid @enderror" required>
               @error('max_children')<div class="invalid-feedback">{{ $message }}</div>@enderror
+            </div>
+            <div class="col-12">
+              <small class="text-muted">Larger groups get more rooms automatically. With 2 adults and 1 child per room, 3 adults get 2 rooms and 5 adults get 3.</small>
             </div>
           </div>
           <div class="mb-3">

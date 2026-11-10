@@ -21,13 +21,15 @@ class SearchController extends Controller
     {
         $releaseExpiredHolds->handle();
 
-        $roomTypes = RoomType::active()->with('rooms')->orderBy('sort_order')->get();
+        // Rooms guests can book first; "Coming soon" rooms at the end of the list.
+        $roomTypes = RoomType::active()->with('rooms')->orderBy('is_coming_soon')->orderBy('sort_order')->get();
 
         $input = [
             'check_in' => $request->query('check_in'),
             'check_out' => $request->query('check_out'),
             'adults' => $request->query('adults', 2),
             'children' => $request->query('children', 0),
+            'rooms' => $request->query('rooms'),
         ];
 
         $stay = null;
@@ -46,7 +48,7 @@ class SearchController extends Controller
                     'check_in' => $checkIn,
                     'check_out' => $checkOut,
                     'nights' => (int) $checkIn->diffInDays($checkOut),
-                    'query' => [...$validator->validated(), 'children' => (int) ($input['children'] ?? 0)],
+                    'query' => array_filter([...$validator->validated(), 'children' => (int) ($input['children'] ?? 0)], fn ($value) => $value !== null),
                 ];
 
                 $roomTypes->each(fn (RoomType $roomType) => $roomType->setAttribute(

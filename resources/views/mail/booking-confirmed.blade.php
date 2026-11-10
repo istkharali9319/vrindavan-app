@@ -13,7 +13,7 @@ Namaste {{ $booking->guest_first_name ?: str($booking->contact_name)->before(' '
 | **Guest** | {{ $booking->guestFullName() }} |
 | **Email** | {{ $booking->contact_email }} |
 | **Mobile** | {{ $booking->contact_phone }} |
-| **Room** | {{ $booking->roomType->name }} · room {{ $booking->room->number }} |
+| **Room** | {{ $booking->roomType->name }} · {{ lcfirst($booking->roomNumbersLabel()) }} |
 | **Check-in** | {{ $booking->check_in->format('D, j M Y') }}, from {{ \Carbon\Carbon::parse(config('booking.check_in_time'))->format('g:i A') }} |
 | **Check-out** | {{ $booking->check_out->format('D, j M Y') }}, by {{ \Carbon\Carbon::parse(config('booking.check_out_time'))->format('g:i A') }} |
 | **Guests** | {{ $booking->guestSummary() }} |
@@ -23,7 +23,7 @@ Namaste {{ $booking->guest_first_name ?: str($booking->contact_name)->before(' '
 <x-mail::table>
 | Charges | |
 |:--|--:|
-| {{ $booking->roomType->name }} · {{ $booking->formattedNightlyPrice() }} × {{ $booking->nights }} {{ str('night')->plural($booking->nights) }} | {{ \App\Support\Money::format($booking->room_amount) }} |
+| {{ $booking->roomType->name }} · {{ $booking->formattedNightlyPrice() }}@if ($booking->rooms_count > 1) × {{ $booking->roomsCountLabel() }}@endif × {{ $booking->nights }} {{ str('night')->plural($booking->nights) }} | {{ \App\Support\Money::format($booking->room_amount) }} |
 @foreach ($booking->addOns as $addOn)
 | {{ $addOn->name }} · {{ $addOn->breakdown() }} | {{ $addOn->amount === 0 ? 'Free' : $addOn->formattedAmount() }} |
 @endforeach

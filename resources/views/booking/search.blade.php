@@ -24,13 +24,8 @@
       <input id="check_out" name="check_out" type="date" value="{{ $input['check_out'] }}"
              min="{{ $earliestCheckIn->addDay()->toDateString() }}" required>
     </div>
-    <div @class(['form-field', 'has-error' => $errors->has('adults')])>
-      <label for="adults">Adults</label>
-      <input id="adults" name="adults" type="number" min="1" max="12" value="{{ $input['adults'] }}" required>
-    </div>
-    <div @class(['form-field', 'has-error' => $errors->has('children')])>
-      <label for="children">Children</label>
-      <input id="children" name="children" type="number" min="0" max="8" value="{{ $input['children'] }}">
+    <div @class(['form-field', 'guest-field', 'has-error' => $errors->hasAny(['adults', 'children', 'rooms'])])>
+      <x-guest-picker :adults="$input['adults']" :children="$input['children']" :rooms="$input['rooms']" data-auto-submit />
     </div>
     <button type="submit" class="btn btn-forest">Check availability</button>
   </form>
@@ -41,6 +36,7 @@
     <p class="stay-summary">
       <strong>{{ $stay['check_in']->format('D, j M Y') }}</strong> → <strong>{{ $stay['check_out']->format('D, j M Y') }}</strong>
       · {{ $stay['nights'] }} {{ str('night')->plural($stay['nights']) }}
+      · {{ $stay['query']['adults'] }} {{ str('adult')->plural((int) $stay['query']['adults']) }}@if ($stay['query']['children']), {{ $stay['query']['children'] }} {{ str('child')->plural((int) $stay['query']['children']) }}@endif
       · Check-in {{ \Carbon\Carbon::parse(config('booking.check_in_time'))->format('g:i A') }}, check-out {{ \Carbon\Carbon::parse(config('booking.check_out_time'))->format('g:i A') }}
     </p>
   @endif
@@ -48,7 +44,8 @@
   <div class="room-options">
     @foreach ($roomTypes as $roomType)
       @php
-          $fitsGuests = (int) $input['adults'] <= $roomType->max_adults && (int) $input['children'] <= $roomType->max_children;
+          // Rooms this group needs in this type (from the admin's per-room limits), or more if they asked for more.
+          $roomsCount = $roomType->roomsToBook((int) $input['adults'], (int) $input['children'], $input['rooms'] !== null ? (int) $input['rooms'] : null);
       @endphp
       <article @class(['room-option', 'is-selected' => $selectedType === $roomType->slug]) id="{{ $roomType->slug }}">
         <div class="room-option-media"><img src="{{ $roomType->imageUrl() }}" alt="{{ $roomType->name }}" loading="lazy"></div>
@@ -56,7 +53,7 @@
           <p class="tag">Rooms {{ $roomType->roomNumberRange() }}</p>
           <h2>{{ $roomType->name }}</h2>
           <p>{{ $roomType->description }}</p>
-          <p class="room-option-meta">{{ $roomType->capacitySummary() }} · Children under {{ config('booking.child_free_below_age') }} stay free</p>
+          <p class="room-option-meta">Up to {{ $roomType->perRoomSummary() }} · Children under {{ config('booking.child_free_below_age') }} stay free</p>
         </div>
         <div class="room-option-price">
           <div class="price-block"><small>Per night</small><strong>{{ $roomType->formattedPrice() }}</strong><em>(Including GST)</em></div>
@@ -64,17 +61,26 @@
           @if ($roomType->is_coming_soon)
             <span class="badge-soft warn">Coming soon</span>
           @elseif ($stay)
-            @if ($roomType->free_rooms === 0)
+            @if ($roomsCount === null)
+              <span class="badge-soft warn">Doesn't fit your group</span>
+              <p class="room-option-note">{{ $roomType->occupancyProblem((int) $input['adults'], (int) $input['children']) }}</p>
+            @elseif ($roomType->free_rooms === 0)
               <span class="badge-soft warn">Fully booked</span>
-            @elseif (! $fitsGuests)
-              <span class="badge-soft warn">Too many guests for one room</span>
+            @elseif ($roomType->free_rooms < $roomsCount)
+              <span class="badge-soft warn">Only {{ $roomType->free_rooms }} {{ str('room')->plural($roomType->free_rooms) }} left</span>
+              <p class="room-option-note">Your group needs {{ $roomsCount }} rooms for these dates.</p>
             @else
+              @php $stayAmount = $roomType->nightly_price * $stay['nights'] * $roomsCount; @endphp
+              <p class="room-allocation">
+                <strong>{{ $roomsCount }} {{ str('room')->plural($roomsCount) }}</strong>
+                for {{ $input['adults'] }} {{ str('adult')->plural((int) $input['adults']) }}@if ((int) $input['children'] > 0) and {{ $input['children'] }} {{ str('child')->plural((int) $input['children']) }}@endif
+              </p>
               <p class="room-option-total">
-                {{ \App\Support\Money::format($roomType->nightly_price * $stay['nights']) }} for {{ $stay['nights'] }} {{ str('night')->plural($stay['nights']) }}
+                {{ \App\Support\Money::format($stayAmount) }} for {{ $stay['nights'] }} {{ str('night')->plural($stay['nights']) }}
                 <span>{{ $roomType->free_rooms }} {{ str('room')->plural($roomType->free_rooms) }} left</span>
               </p>
-              <a href="{{ route('booking.create', [$roomType, ...$stay['query']]) }}" class="btn btn-forest"
-                 data-book-room data-room-name="{{ $roomType->name }}" data-room-amount="{{ $roomType->nightly_price * $stay['nights'] }}">Book this room <span class="arrow">→</span></a>
+              <a href="{{ route('booking.create', [$roomType, ...$stay['query'], 'rooms' => $roomsCount]) }}" class="btn btn-forest"
+                 data-book-room data-room-name="{{ $roomType->name }}" data-room-amount="{{ $stayAmount }}">Book {{ $roomsCount > 1 ? $roomsCount.' rooms' : 'this room' }} <span class="arrow">→</span></a>
             @endif
           @else
             <a href="#check_in" class="text-link">Choose dates to check availability</a>
@@ -110,9 +116,9 @@
                     <small>{{ \Illuminate\Support\Str::limit($addOn->description, 120) }}</small>
                   @endif
                   <span class="addon-card-price">
-                    {{ $addOn->priceLabel() }}
+                    @if ($addOn->price)<span class="stay-price">{{ \App\Support\Money::format($addOn->price) }}</span> {{ $addOn->price_unit->label() }}@else{{ $addOn->priceLabel() }}@endif
                     @if (! $addOn->isComplimentary() && $addOn->price_unit !== \App\Enums\PriceUnit::PerBooking)
-                      <em>· {{ \App\Support\Money::format($amount) }} for your stay</em>
+                      <em>· <span class="stay-price">{{ \App\Support\Money::format($amount) }}</span> for your stay</em>
                     @endif
                   </span>
                 </span>

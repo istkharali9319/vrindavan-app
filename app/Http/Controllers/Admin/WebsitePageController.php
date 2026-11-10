@@ -7,10 +7,12 @@ use App\Http\Requests\Admin\UpdatePageContentRequest;
 use App\Models\ContentItem;
 use App\Models\SiteContent;
 use App\Support\ContentFieldRules;
+use App\Support\ImageUpload;
 use App\Support\MailCheck;
 use App\Support\WebsiteContent;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
@@ -109,6 +111,18 @@ class WebsitePageController extends Controller
         SiteContent::updateOrCreate(['page' => $page, 'key' => $key], ['value' => $value]);
     }
 
+    /**
+     * Logos and the browser-tab icon stay lossless PNG (emails embed the logo); every other image is a photo.
+     */
+    private static function storeImage(UploadedFile $file, string $folder, string $key): string
+    {
+        return match (true) {
+            str_ends_with($key, 'favicon') => ImageUpload::logo($file, $folder, 512),
+            str_ends_with($key, 'logo') => ImageUpload::logo($file, $folder),
+            default => ImageUpload::photo($file, $folder),
+        };
+    }
+
     private function saveImage(UpdatePageContentRequest $request, string $page, string $key, string $default): void
     {
         $current = SiteContent::where(['page' => $page, 'key' => $key])->first();
@@ -117,7 +131,7 @@ class WebsitePageController extends Controller
             $this->deleteUpload($current?->value);
             SiteContent::updateOrCreate(
                 ['page' => $page, 'key' => $key],
-                ['value' => $request->file("images.{$key}")->store("content/{$page}", 'public')],
+                ['value' => self::storeImage($request->file("images.{$key}"), "content/{$page}", $key)],
             );
         } elseif ($request->boolean("reset.{$key}") && $current) {
             $this->deleteUpload($current->value);

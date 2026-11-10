@@ -56,6 +56,7 @@ class StayRequest extends FormRequest
             'check_out' => ['required', 'date_format:Y-m-d', 'after:check_in'],
             'adults' => ['required', 'integer', 'min:1', 'max:12'],
             'children' => ['nullable', 'integer', 'min:0', 'max:8'],
+            'rooms' => ['nullable', 'integer', 'min:1', 'max:12', 'lte:adults'],
         ];
     }
 
@@ -68,6 +69,7 @@ class StayRequest extends FormRequest
             'check_in.after_or_equal' => 'The earliest check-in we can take is '.self::earliestCheckIn()->format('j M Y').'.',
             'check_in.before_or_equal' => 'We take bookings up to '.self::latestCheckIn()->format('j M Y').'.',
             'check_out.after' => 'Check-out must be after check-in.',
+            'rooms.lte' => 'Each room needs at least one adult, so you can book up to one room per adult.',
         ];
     }
 
@@ -119,6 +121,8 @@ class StayRequest extends FormRequest
     }
 
     /**
+     * The group must fit this room type once it is split across rooms (see RoomType::roomsNeededFor()).
+     *
      * @return Closure(Validator): void
      */
     protected static function occupancyCheck(?RoomType $roomType): Closure
@@ -129,13 +133,10 @@ class StayRequest extends FormRequest
             }
 
             $data = $validator->getData();
+            $problem = $roomType->occupancyProblem((int) $data['adults'], (int) ($data['children'] ?? 0));
 
-            if ((int) $data['adults'] > $roomType->max_adults) {
-                $validator->errors()->add('adults', "The {$roomType->name} sleeps up to {$roomType->max_adults} adults.");
-            }
-
-            if ((int) ($data['children'] ?? 0) > $roomType->max_children) {
-                $validator->errors()->add('children', "The {$roomType->name} has room for up to {$roomType->max_children} children.");
+            if ($problem !== null) {
+                $validator->errors()->add('children', $problem);
             }
         };
     }

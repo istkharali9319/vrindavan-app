@@ -37,9 +37,20 @@ class RoomOccupancy
             ->get()
             ->mapWithKeys(fn (RoomNight $night): array => [$night->room_id => $night->booking]);
 
-        $confirmed = Booking::query()->where('status', BookingStatus::Confirmed);
-        $arrivals = (clone $confirmed)->whereDate('check_in', $day)->get()->keyBy('room_id');
-        $departures = (clone $confirmed)->whereDate('check_out', $day)->get()->keyBy('room_id');
+        // A group booking arrives and leaves in every one of its rooms.
+        $confirmed = Booking::query()->with('rooms:id')->where('status', BookingStatus::Confirmed);
+        $byRoom = function (Collection $bookings): Collection {
+            $map = [];
+            foreach ($bookings as $booking) {
+                foreach ($booking->rooms->modelKeys() ?: [$booking->room_id] as $roomId) {
+                    $map[$roomId] = $booking;
+                }
+            }
+
+            return collect($map);
+        };
+        $arrivals = $byRoom((clone $confirmed)->whereDate('check_in', $day)->get());
+        $departures = $byRoom((clone $confirmed)->whereDate('check_out', $day)->get());
 
         return Room::query()
             ->with('roomType')

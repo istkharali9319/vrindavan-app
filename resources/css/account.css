@@ -80,6 +80,32 @@
   border-color: var(--forest-3);
   box-shadow: 0 0 0 3px rgba(44, 66, 54, .12);
 }
+/* Password with a show/hide eye button */
+.password-field { position: relative; }
+.form-field .password-field input { padding-right: 50px; }
+.password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  transform: translateY(-50%);
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  transition: color .2s, background .2s;
+}
+.password-toggle:hover { color: var(--forest); background: var(--cream-2); }
+.password-toggle:focus-visible { outline: 2px solid var(--forest-3); outline-offset: 1px; }
+.password-toggle svg { width: 20px; height: 20px; }
+.password-toggle .icon-hide,
+.password-toggle[aria-pressed="true"] .icon-show { display: none; }
+.password-toggle[aria-pressed="true"] .icon-hide { display: block; }
 .form-field .hint { display: block; margin-top: 6px; font-size: 12.5px; color: var(--muted); }
 .form-field.has-error input { border-color: #b4573d; }
 .field-error { display: block; margin-top: 6px; font-size: 13px; color: #a3462e; }
@@ -105,7 +131,8 @@
   display: grid;
   grid-template-columns: 240px 1fr;
   gap: 48px;
-  padding: 60px 0 100px;
+  padding-top: 60px;
+  padding-bottom: 100px;
   align-items: start;
 }
 .account-nav {
@@ -218,7 +245,7 @@
 }
 
 /* ---------- Booking ---------- */
-.booking-page { padding: 60px 0 100px; }
+.booking-page { padding-top: 60px; padding-bottom: 100px; }
 .booking-head { margin-bottom: 30px; }
 .booking-head .eyebrow { color: var(--bronze); }
 .booking-head h1 { font-family: var(--serif); font-size: clamp(36px, 4.4vw, 52px); font-weight: 400; margin-bottom: 8px; }
@@ -227,7 +254,7 @@
 
 .stay-form {
   display: grid;
-  grid-template-columns: 1.4fr 1.4fr 1fr 1fr auto;
+  grid-template-columns: 1.2fr 1.2fr 1.6fr auto;
   gap: 16px;
   align-items: end;
 }
@@ -246,7 +273,7 @@
   border: 1px solid var(--line);
   border-radius: 18px;
 }
-.room-option-media { border-radius: 14px; overflow: hidden; align-self: stretch; min-height: 150px; }
+.room-option-media { border-radius: 14px; overflow: hidden; align-self: start; aspect-ratio: 4 / 3; }
 .room-option-media img { width: 100%; height: 100%; object-fit: cover; }
 .room-option.is-selected { border-color: var(--bronze); box-shadow: var(--shadow-soft); }
 .room-option h2 { font-family: var(--serif); font-size: 30px; font-weight: 500; margin: 4px 0 8px; }
@@ -254,6 +281,9 @@
 .room-option-meta { margin-top: 12px; font-size: 13.5px !important; }
 .room-option-price { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; padding-left: 30px; border-left: 1px solid var(--line); }
 .room-option-total { font-weight: 600; font-size: 15px; }
+.room-allocation { margin: 0; font-size: 14px; color: var(--muted); }
+.room-allocation strong { color: var(--forest); }
+.room-option-note { margin: 0; font-size: 13px; line-height: 1.5; color: var(--muted); }
 .room-option-total span { display: block; font-weight: 400; font-size: 13px; color: var(--bronze-3); }
 
 .booking-grid { display: grid; grid-template-columns: 1fr 380px; gap: 26px; align-items: start; }
@@ -281,8 +311,10 @@
 @media (max-width: 960px) {
   .stay-form { grid-template-columns: 1fr 1fr; }
   .stay-form .btn { grid-column: 1 / -1; }
+  .stay-form .guest-field { grid-column: 1 / -1; }
+  .stay-form .guest-picker-panel { left: 0; right: auto; }
   .room-option { grid-template-columns: 1fr; gap: 18px; padding: 24px 22px; }
-  .room-option-media { aspect-ratio: 16 / 9; min-height: 0; }
+  .room-option-media { aspect-ratio: 16 / 9; }
   .room-option-price { padding-left: 0; border-left: 0; padding-top: 18px; border-top: 1px solid var(--line); }
   .booking-grid { grid-template-columns: 1fr; }
   .booking-summary { position: static; order: -1; }
@@ -339,10 +371,10 @@
 .line-field input:focus, .line-field select:focus, .line-field textarea:focus { border-bottom-color: var(--bronze); box-shadow: 0 1px 0 var(--bronze); }
 .line-field.has-error input, .line-field.has-error select, .line-field.has-error textarea { border-bottom-color: #c0392b; }
 .line-field.is-area { margin-bottom: 26px; }
-.line-field textarea { min-height: 70px; resize: vertical; font-size: 16px; }
+.line-field textarea { min-height: 70px; resize: vertical; }
 .char-count { justify-self: end; color: #8d8a82; font-size: 13px; }
 .phone-input { display: grid; grid-template-columns: 112px 1fr; gap: 14px; }
-.phone-input select { font-size: 15px; }
+.phone-input select { font-size: 18px; }
 .terms-check { display: flex; align-items: flex-start; gap: 12px; margin: 6px 0 4px; font-size: 15px; color: #4d4b45; cursor: pointer; }
 .terms-check input { flex-shrink: 0; width: 22px; height: 22px; margin-top: 1px; accent-color: var(--forest); }
 .terms-check a { color: var(--bronze-3); text-decoration: underline; }
@@ -365,13 +397,16 @@
 .stay-card-dates dd { margin: 2px 0 0; font-size: 14.5px; font-weight: 600; }
 .stay-card-dates small { display: block; font-weight: 400; color: var(--muted); font-size: 12.5px; }
 .stay-card-lines { display: grid; gap: 10px; padding: 16px 22px 0; font-size: 14.5px; }
-.stay-card-lines > div { display: flex; justify-content: space-between; gap: 12px; }
+.stay-card-lines > div { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
 .stay-card-lines .is-muted { color: var(--muted); }
 .stay-card-total { display: flex; justify-content: space-between; align-items: baseline; margin: 18px 22px 0; padding-top: 16px; border-top: 1px solid #cdb07a; font-weight: 600; }
-.stay-card-total strong { font-size: 20px; }
+.stay-card-total strong { font-family: var(--serif); font-size: 30px; font-weight: 600; color: var(--ink); }
+/* Amounts use the same serif price style as the room list on /book */
+.stay-card-lines .stay-price, .addon-card-price .stay-price { font-family: var(--serif); font-size: 1.3em; font-weight: 600; }
+.stay-card-lines > div:not(.is-muted) > span:last-child { font-family: var(--serif); font-size: 22px; font-weight: 600; white-space: nowrap; }
 .stay-card-pay { margin: 12px 22px 0; padding: 8px 12px; border-radius: 8px; background: #fbf3e4; color: var(--bronze-3); font-size: 13.5px; font-weight: 600; text-align: center; }
 .stay-card-box.is-policy { padding: 20px 22px; border-color: var(--line); }
-.stay-card-box.is-policy h3 { margin: 0 0 10px; font-family: var(--sans); font-size: 17px; font-weight: 600; }
+.stay-card-box.is-policy h3 { margin: 0 0 10px; font-family: var(--serif); font-size: 22px; font-weight: 400; letter-spacing: .03em; text-transform: uppercase; }
 .stay-card-box.is-policy p { margin: 0 0 8px; color: #5d5a52; font-size: 14px; line-height: 1.6; }
 
 .confirm-panel { text-align: left; }
@@ -546,7 +581,7 @@
    Online payment (Razorpay): choice on the details form + payment page
    ========================================================== */
 .pay-choice { margin: 8px 0 22px; padding: 0; border: 0; }
-.pay-choice legend { margin-bottom: 12px; font-family: var(--serif); font-size: 24px; font-weight: 500; color: var(--ink); }
+.pay-choice legend { margin-bottom: 12px; font-family: var(--serif); font-size: 24px; font-weight: 400; letter-spacing: .02em; text-transform: uppercase; color: var(--ink); }
 .pay-option {
   display: flex;
   align-items: flex-start;

@@ -193,7 +193,7 @@ class AdminRoomManagementTest extends TestCase
         $this->get(route('home'))
             ->assertOk()
             ->assertSee('Separate Family Cottage')
-            ->assertSee(route('accommodation').'#deluxe-room', false)
+            ->assertSee(route('accommodation.show', 'deluxe-room'), false)
             ->assertDontSee('Secret Treehouse');
     }
 }

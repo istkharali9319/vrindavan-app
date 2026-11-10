@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ContentItemRequest;
 use App\Models\ContentItem;
 use App\Support\ContentFieldRules;
+use App\Support\ImageUpload;
 use App\Support\WebsiteContent;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -169,7 +170,7 @@ class WebsiteItemController extends Controller
 
                 if ($request->hasFile("images.{$key}")) {
                     $this->deleteUpload($current[$key] ?? null);
-                    $data[$key] = $request->file("images.{$key}")->store("content/{$request->route('collection')}", 'public');
+                    $data[$key] = ImageUpload::photo($request->file("images.{$key}"), "content/{$request->route('collection')}");
                 }
 
                 continue;

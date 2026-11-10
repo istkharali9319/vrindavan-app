@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Storage;
 
 Route::get('/', Site\HomeController::class)->name('home');
 Route::get('/accommodation', Site\AccommodationController::class)->name('accommodation');
+Route::get('/accommodation/{roomType:slug}', [Site\AccommodationController::class, 'show'])->name('accommodation.show');
 Route::get('/experiences', Site\ExperienceController::class)->name('experience');
 Route::view('/dining', 'site.dining')->name('dining');
 Route::view('/gallery', 'site.gallery')->name('gallery');
@@ -130,6 +131,11 @@ Route::get('/user/confirmed-password-status', fn () => abort(404));
 
 Route::permanentRedirect('/index.html', '/');
 Route::permanentRedirect('/accommodation.html', '/accommodation');
+
+// The reset form only exists with the token from the email (/reset-password/{token}). Opening the bare
+// address, e.g. from an old or cut-off link, goes to "Forgot password" instead of an error page.
+Route::get('/reset-password', fn () => redirect()->route('password.request', array_filter(['portal' => request('portal')]))
+    ->with('status', 'That reset link is incomplete or has expired. Enter your email and we’ll send you a new one.'));
 Route::permanentRedirect('/experience.html', '/experiences');
 Route::permanentRedirect('/dining.html', '/dining');
 Route::permanentRedirect('/gallery.html', '/gallery');

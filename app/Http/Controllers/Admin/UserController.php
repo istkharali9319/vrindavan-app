@@ -100,7 +100,7 @@ class UserController extends Controller
                 'nights' => (int) (clone $confirmed)->sum('nights'),
                 'spent' => (int) (clone $confirmed)->sum('total_amount'),
             ],
-            'bookings' => $user->bookings()->with(['roomType', 'room'])->latest()->limit(20)->get(),
+            'bookings' => $user->bookings()->with(['roomType', 'room', 'rooms'])->latest()->limit(20)->get(),
         ]);
     }
 

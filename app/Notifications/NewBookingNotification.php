@@ -32,13 +32,13 @@ class NewBookingNotification extends Notification implements ShouldQueue
      */
     public function toArray(object $notifiable): array
     {
-        $booking = $this->booking->loadMissing(['roomType', 'room', 'addOns']);
+        $booking = $this->booking->loadMissing(['roomType', 'room', 'rooms', 'addOns']);
 
         return [
             'kind' => 'booking.new',
             'icon' => 'calendar-plus',
             'title' => "New booking {$booking->reference} · {$booking->formattedTotal()}",
-            'body' => $booking->guestFullName().' ('.$booking->contact_phone.') · '.$booking->roomType->name.', room '.$booking->room->number
+            'body' => $booking->guestFullName().' ('.$booking->contact_phone.') · '.$booking->roomType->name.', '.lcfirst($booking->roomNumbersLabel())
                 .' · '.$booking->check_in->format('j M').' → '.$booking->check_out->format('j M Y').' · '.$booking->guestSummary()
                 .($booking->addOns->isNotEmpty() ? ' · '.$booking->addOns->count().' add-on(s)' : '')
                 .' · '.$booking->payment_status->label().($booking->isGuestCheckout() ? ' · guest checkout' : ''),

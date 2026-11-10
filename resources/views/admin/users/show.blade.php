@@ -86,7 +86,7 @@
                 <small>{{ $booking->check_in->format('M') }}</small>
               </span>
               <span class="user-booking-body">
-                <strong>{{ $booking->roomType->name }} · Room {{ $booking->room->number }}</strong>
+                <strong>{{ $booking->roomType->name }} · {{ $booking->roomNumbersLabel() }}</strong>
                 <span>{{ $booking->check_in->format('D, j M Y') }} → {{ $booking->check_out->format('D, j M Y') }} · {{ $booking->nights }} {{ str('night')->plural($booking->nights) }} · {{ $booking->guestSummary() }}</span>
                 <small>{{ $booking->reference }}</small>
               </span>

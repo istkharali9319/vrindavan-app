@@ -17,7 +17,7 @@ class BookingInvoice
 
     public static function for(Booking $booking): self
     {
-        return new self($booking->loadMissing(['roomType', 'room', 'addOns']));
+        return new self($booking->loadMissing(['roomType', 'room', 'rooms', 'addOns']));
     }
 
     /**

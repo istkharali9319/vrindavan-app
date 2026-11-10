@@ -76,7 +76,7 @@
       </td>
       <td>
         <div class="label">Stay</div>
-        <strong>{{ $booking->roomType->name }} · Room {{ $booking->room->number }}</strong><br>
+        <strong>{{ $booking->roomType->name }} · {{ $booking->roomNumbersLabel() }}</strong><br>
         {{ $booking->check_in->format('D, j M Y') }} → {{ $booking->check_out->format('D, j M Y') }}<br>
         {{ $booking->nights }} {{ str('night')->plural($booking->nights) }} · {{ $booking->guestSummary() }}
       </td>
@@ -89,9 +89,9 @@
     </thead>
     <tbody>
       <tr>
-        <td>{{ $booking->roomType->name }} — room {{ $booking->room->number }}<br><span class="muted">{{ $booking->check_in->format('j M') }} – {{ $booking->check_out->format('j M Y') }}</span></td>
-        <td class="num">{{ Money::format($booking->nightly_price) }} / night</td>
-        <td class="num">{{ $booking->nights }}</td>
+        <td>{{ $booking->roomType->name }} — {{ lcfirst($booking->roomNumbersLabel()) }}<br><span class="muted">{{ $booking->check_in->format('j M') }} – {{ $booking->check_out->format('j M Y') }}</span></td>
+        <td class="num">{{ Money::format($booking->nightly_price) }} / {{ $booking->rooms_count > 1 ? 'room / night' : 'night' }}</td>
+        <td class="num">{{ $booking->nights }}@if ($booking->rooms_count > 1) × {{ $booking->rooms_count }}<br><span class="muted">nights × rooms</span>@endif</td>
         <td class="num">{{ Money::format($booking->room_amount) }}</td>
       </tr>
       @foreach ($booking->addOns as $addOn)

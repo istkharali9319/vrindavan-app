@@ -1,4 +1,4 @@
-{{-- Shared layout for error pages (403, 404, 419, 429), inside the website header and footer. --}}
+{{-- Shared layout for error pages (4xx), inside the website header and footer. --}}
 @extends('layouts.site')
 
 @section('title', $title.' · '.config('resort.name'))

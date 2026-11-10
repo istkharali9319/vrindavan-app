@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\RoomTypeRequest;
 use App\Models\RoomType;
+use App\Support\RoomPhoto;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
@@ -60,6 +61,7 @@ class RoomTypeController extends Controller
 
     /**
      * Replaces the main photo, removes ticked gallery photos and appends new ones.
+     * New photos are cropped to 4:3 so every room shows at the same size (see RoomPhoto).
      */
     private function savePhotos(RoomTypeRequest $request, RoomType $roomType): void
     {
@@ -70,7 +72,7 @@ class RoomTypeController extends Controller
             if ($roomType->image_path) {
                 $disk->delete($roomType->image_path);
             }
-            $roomType->image_path = $request->file('image')->store($folder, 'public');
+            $roomType->image_path = RoomPhoto::store($request->file('image'), $folder);
         }
 
         $gallery = $roomType->gallery ?? [];
@@ -82,7 +84,7 @@ class RoomTypeController extends Controller
             if (count($gallery) >= RoomTypeRequest::MAX_GALLERY_PHOTOS) {
                 break;
             }
-            $gallery[] = $photo->store($folder, 'public');
+            $gallery[] = RoomPhoto::store($photo, $folder);
         }
 
         $roomType->gallery = $gallery;

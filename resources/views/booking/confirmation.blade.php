@@ -21,7 +21,7 @@
         @if ($booking->isCancelled())
           <span class="confirm-badge is-cancelled">✕</span>
           <h2>This booking was cancelled</h2>
-          <p class="guest-panel-intro">Room {{ $booking->room->number }} has been released. Contact us if this is unexpected.</p>
+          <p class="guest-panel-intro">{{ $booking->roomNumbersLabel() }} {{ $booking->rooms_count > 1 ? 'have' : 'has' }} been released. Contact us if this is unexpected.</p>
         @else
           <span class="confirm-badge">✓</span>
           <h2>{{ $content->text('confirmation.title') }}</h2>
@@ -90,7 +90,7 @@
           <div class="stay-card-room">
             <img src="{{ $booking->roomType->imageUrl() }}" alt="{{ $booking->roomType->name }}">
             <div>
-              <strong>Room {{ $booking->room->number }}</strong>
+              <strong>{{ $booking->roomNumbersLabel() }}</strong>
               <span>{{ $booking->roomType->name }}</span>
             </div>
           </div>
@@ -99,7 +99,7 @@
             <div><dt>Check-out</dt><dd>{{ $booking->check_out->format('D, j M Y') }}<small>by {{ $checkOutTime }}</small></dd></div>
           </dl>
           <div class="stay-card-lines">
-            <div><span>{{ $booking->formattedNightlyPrice() }} × {{ $booking->nights }} {{ str('night')->plural($booking->nights) }}</span><span>{{ Money::format($booking->room_amount) }}</span></div>
+            <div><span>{{ $booking->formattedNightlyPrice() }}@if ($booking->rooms_count > 1) × {{ $booking->roomsCountLabel() }}@endif × {{ $booking->nights }} {{ str('night')->plural($booking->nights) }}</span><span>{{ Money::format($booking->room_amount) }}</span></div>
             @foreach ($booking->addOns as $addOn)
               <div><span>+ {{ $addOn->name }}<small class="stay-card-sub">{{ $addOn->breakdown() }}</small></span><span>{{ $addOn->amount === 0 ? 'Free' : $addOn->formattedAmount() }}</span></div>
             @endforeach
